@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="sv">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <header>
+        <h1>StudyBuddy</h1>
+        <nav>
+            <a href="{{ url_for('show_home_page') }}">Hem</a>
+            <a href="{{ url_for('logout_user') }}">Logga ut</a>
+        </nav>
+    </header>
+
+    <main>
+        <section class="card">
+            <h2>Dashboard</h2>
+
+            {% with messages = get_flashed_messages() %}
+                {% if messages %}
+                    {% for message in messages %}
+                        <p class="flash-message">{{ message }}</p>
+                    {% endfor %}
+                {% endif %}
+            {% endwith %}
+
+            {% if profile %}
+                <p><strong>Namn:</strong> {{ profile[2] }}</p>
+                <p><strong>E-post:</strong> {{ profile[1] }}</p>
+                <p><strong>Campus:</strong> {{ profile[3] or 'Ej angivet' }}</p>
+                <p><strong>Ämne:</strong> {{ profile[4] or 'Ej angivet' }}</p>
+                <p><strong>Studietyp:</strong> {{ profile[5] or 'Ej angivet' }}</p>
+            {% else %}
+                <p>Ingen profil hittades.</p>
+            {% endif %}
+        </section>
+    </main>
+</body>
+</html>
