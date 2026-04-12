@@ -1,0 +1,45 @@
+body {
+    font-family: Arial, sans-serif;
+    background-color: #f8f4f4;
+    margin: 0;
+    padding: 0;
+    color: #2b1b1b;
+}
+
+header {
+    background-color: #5c0f17;
+    color: white;
+    padding: 20px;
+}
+
+header h1 {
+    margin: 0 0 10px 0;
+}
+
+nav a {
+    color: white;
+    text-decoration: none;
+    margin-right: 15px;
+    font-weight: bold;
+}
+
+main {
+    padding: 20px;
+}
+
+.card {
+    background-color: white;
+    padding: 20px;
+    border-radius: 8px;
+    max-width: 700px;
+    box-shadow: 0 2px 8px rgba(92, 15, 23, 0.08);
+}
+
+.button-link {
+    background-color: #8b1e2d;
+    color: white;
+    text-decoration: none;
+    padding: 10px 14px;
+    display: inline-block;
+    border-radius: 5px;
+}

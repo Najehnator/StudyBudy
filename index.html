@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="sv">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>StudyBuddy</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <header>
+        <h1>StudyBuddy</h1>
+        <nav>
+            <a href="/">Hem</a>
+            <a href="/login">Logga in</a>
+            <a href="/register">Registrera</a>
+        </nav>
+    </header>
+
+    <main>
+        <section class="card">
+            <h2>Hitta din studiekamrat</h2>
+            <p>StudyBuddy hjälper studenter att hitta andra att plugga med.</p>
+            <a class="button-link" href="/login">Kom igång</a>
+        </section>
+    </main>
+</body>
+</html>
