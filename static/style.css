@@ -23,6 +23,10 @@ nav a {
     font-weight: bold;
 }
 
+nav a:hover {
+    text-decoration: underline;
+}
+
 main {
     padding: 20px;
 }
@@ -35,11 +39,49 @@ main {
     box-shadow: 0 2px 8px rgba(92, 15, 23, 0.08);
 }
 
+label {
+    display: block;
+    margin-top: 12px;
+    margin-bottom: 5px;
+    color: #5c0f17;
+    font-weight: bold;
+}
+
+input,
+textarea {
+    width: 100%;
+    padding: 10px;
+    box-sizing: border-box;
+    margin-bottom: 10px;
+    border: 1px solid #c9b3b3;
+    border-radius: 5px;
+    background-color: #fffdfd;
+    color: #2b1b1b;
+}
+
+button,
 .button-link {
     background-color: #8b1e2d;
     color: white;
+    border: none;
     text-decoration: none;
     padding: 10px 14px;
     display: inline-block;
     border-radius: 5px;
+    cursor: pointer;
+    width: auto;
+}
+
+button:hover,
+.button-link:hover {
+    background-color: #6f1622;
+}
+
+.flash-message {
+    background-color: #f7dede;
+    color: #5c0f17;
+    padding: 10px;
+    border-radius: 5px;
+    margin-bottom: 10px;
+    border: 1px solid #ddb7bc;
 }

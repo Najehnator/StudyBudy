@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="sv">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Registrera</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <header>
+        <h1>StudyBuddy</h1>
+        <nav>
+            <a href="{{ url_for('show_home_page') }}">Hem</a>
+            <a href="{{ url_for('show_login_page') }}">Logga in</a>
+        </nav>
+    </header>
+
+    <main>
+        <section class="card">
+            <h2>Registrera konto</h2>
+
+            {% with messages = get_flashed_messages() %}
+                {% if messages %}
+                    {% for message in messages %}
+                        <p class="flash-message">{{ message }}</p>
+                    {% endfor %}
+                {% endif %}
+            {% endwith %}
+
+            <form method="POST">
+                <label for="email">E-post</label>
+                <input type="email" id="email" name="email" required>
+
+                <label for="password">Lösenord</label>
+                <input type="password" id="password" name="password" required>
+
+                <button type="submit">Skapa konto</button>
+            </form>
+        </section>
+    </main>
+</body>
+</html>
