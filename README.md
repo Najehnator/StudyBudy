@@ -1,5 +1,6 @@
 # StudyBudy
 
+
 ## README för granskande grupp
 
 Det här dokumentet beskriver:
