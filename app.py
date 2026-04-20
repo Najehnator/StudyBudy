@@ -234,6 +234,104 @@ def update_user_profile(user_id, display_name, campus, subject, study_type,
     cursor.close()
 
 
+
+def get_possible_matches_for_user(current_user_id, campus_filter="", subject_filter=""):
+    """
+    Hämtar möjliga studiekamrater för den inloggade användaren.
+
+    Matchningen hålls enkel:
+    - samma ämne ger poäng
+    - samma campus ger poäng
+    - samma studietyp ger poäng
+    - om den andres kompetenser matchar mina behov ger det poäng
+    - om mina kompetenser matchar den andres behov ger det poäng
+
+    Kravkoppling:
+    - F-MAT-1: Systemet ska matcha användare baserat på behov och kompetenser.
+    - F-MAT-1.1: Systemet ska möjliggöra filtrering efter campus.
+    - F-MAT-1.2: Systemet ska möjliggöra filtrering efter ämne.
+    """
+    connection = get_database_connection()
+    cursor = connection.cursor()
+
+    sql_query = """
+        SELECT
+            other_user.id,
+            other_user.display_name,
+            other_user.campus,
+            other_user.subject,
+            other_user.study_type,
+            other_user.availability,
+            other_user.competencies,
+            other_user.needs,
+            other_user.bio,
+            other_user.profile_image,
+            (
+                CASE
+                    WHEN my_user.subject IS NOT NULL
+                     AND other_user.subject IS NOT NULL
+                     AND my_user.subject = other_user.subject
+                    THEN 1 ELSE 0
+                END
+                +
+                CASE
+                    WHEN my_user.campus IS NOT NULL
+                     AND other_user.campus IS NOT NULL
+                     AND my_user.campus = other_user.campus
+                    THEN 1 ELSE 0
+                END
+                +
+                CASE
+                    WHEN my_user.study_type IS NOT NULL
+                     AND other_user.study_type IS NOT NULL
+                     AND my_user.study_type = other_user.study_type
+                    THEN 1 ELSE 0
+                END
+                +
+                CASE
+                    WHEN my_user.needs IS NOT NULL
+                     AND my_user.needs <> ''
+                     AND other_user.competencies IS NOT NULL
+                     AND other_user.competencies ILIKE '%%' || my_user.needs || '%%'
+                    THEN 1 ELSE 0
+                END
+                +
+                CASE
+                    WHEN other_user.needs IS NOT NULL
+                     AND other_user.needs <> ''
+                     AND my_user.competencies IS NOT NULL
+                     AND my_user.competencies ILIKE '%%' || other_user.needs || '%%'
+                    THEN 1 ELSE 0
+                END
+            ) AS match_score
+        FROM users AS my_user
+        JOIN users AS other_user
+            ON my_user.id <> other_user.id
+        WHERE my_user.id = %s
+          AND other_user.id <> %s
+    """
+
+    query_values = [current_user_id, current_user_id]
+
+    if campus_filter:
+        sql_query += " AND other_user.campus ILIKE %s"
+        query_values.append(f"%{campus_filter}%")
+
+    if subject_filter:
+        sql_query += " AND other_user.subject ILIKE %s"
+        query_values.append(f"%{subject_filter}%")
+
+    sql_query += """
+        ORDER BY match_score DESC,
+                 other_user.display_name ASC
+    """
+
+    cursor.execute(sql_query, tuple(query_values))
+    rows = cursor.fetchall()
+    cursor.close()
+    return rows
+
+
 # --------------------------------------------------
 # ROUTES
 # --------------------------------------------------
