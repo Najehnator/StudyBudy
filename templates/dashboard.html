@@ -2,7 +2,6 @@
 <html lang="sv">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Dashboard</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 </head>
@@ -10,7 +9,8 @@
     <header>
         <h1>StudyBuddy</h1>
         <nav>
-            <a href="{{ url_for('show_home_page') }}">Hem</a>
+            <a href="{{ url_for('show_dashboard_page') }}">Dashboard</a>
+            <a href="{{ url_for('show_profile_page') }}">Redigera profil</a>
             <a href="{{ url_for('logout_user') }}">Logga ut</a>
         </nav>
     </header>
@@ -28,13 +28,21 @@
             {% endwith %}
 
             {% if profile %}
+                {% if profile[10] %}
+                    <img class="profile-image" src="{{ url_for('static', filename='uploads/' + profile[10]) }}" alt="Profilbild">
+                {% endif %}
+
                 <p><strong>Namn:</strong> {{ profile[2] }}</p>
                 <p><strong>E-post:</strong> {{ profile[1] }}</p>
                 <p><strong>Campus:</strong> {{ profile[3] or 'Ej angivet' }}</p>
                 <p><strong>Ämne:</strong> {{ profile[4] or 'Ej angivet' }}</p>
                 <p><strong>Studietyp:</strong> {{ profile[5] or 'Ej angivet' }}</p>
-            {% else %}
-                <p>Ingen profil hittades.</p>
+                <p><strong>Tillgänglighet:</strong> {{ profile[6] or 'Ej angivet' }}</p>
+                <p><strong>Kompetenser:</strong> {{ profile[7] or 'Ej angivet' }}</p>
+                <p><strong>Behöver hjälp med:</strong> {{ profile[8] or 'Ej angivet' }}</p>
+                <p><strong>Bio:</strong> {{ profile[9] or 'Ej angivet' }}</p>
+
+                <a class="button-link" href="{{ url_for('show_profile_page') }}">Ändra information</a>
             {% endif %}
         </section>
     </main>

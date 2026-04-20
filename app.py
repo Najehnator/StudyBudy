@@ -1,12 +1,18 @@
+import os
 import re
 from functools import wraps
 
 import psycopg2
 from flask import Flask, flash, g, redirect, render_template, request, session, url_for
 from werkzeug.security import check_password_hash, generate_password_hash
+from werkzeug.utils import secure_filename
 
 app = Flask(__name__)
 app.secret_key = "simple-secret-key"
+
+UPLOAD_FOLDER = "static/uploads"
+app.config["UPLOAD_FOLDER"] = UPLOAD_FOLDER
+os.makedirs(UPLOAD_FOLDER, exist_ok=True)
 
 
 # --------------------------------------------------
@@ -121,7 +127,7 @@ def create_new_user(email, password):
     connection = get_database_connection()
     cursor = connection.cursor()
 
-    password_hash = generate_password_hash(password)
+    password_hash = generate_password_hash(password, method="pbkdf2:sha256")
     display_name = email.split("@")[0]
 
     cursor.execute(
@@ -148,7 +154,7 @@ def get_profile_for_user(user_id):
     cursor.execute(
         """
         SELECT id, email, display_name, campus, subject, study_type,
-               availability, competencies, needs, bio
+               availability, competencies, needs, bio, profile_image
         FROM users
         WHERE id = %s
         """,
@@ -157,6 +163,75 @@ def get_profile_for_user(user_id):
     profile_row = cursor.fetchone()
     cursor.close()
     return profile_row
+
+
+def update_user_profile(user_id, display_name, campus, subject, study_type,
+                        availability, competencies, needs, bio, profile_image):
+    """
+    Uppdaterar profilinformation för den inloggade användaren.
+    """
+    connection = get_database_connection()
+    cursor = connection.cursor()
+
+    if profile_image:
+        cursor.execute(
+            """
+            UPDATE users
+            SET display_name = %s,
+                campus = %s,
+                subject = %s,
+                study_type = %s,
+                availability = %s,
+                competencies = %s,
+                needs = %s,
+                bio = %s,
+                profile_image = %s,
+                updated_at = CURRENT_TIMESTAMP
+            WHERE id = %s
+            """,
+            (
+                display_name,
+                campus,
+                subject,
+                study_type,
+                availability,
+                competencies,
+                needs,
+                bio,
+                profile_image,
+                user_id
+            )
+        )
+    else:
+        cursor.execute(
+            """
+            UPDATE users
+            SET display_name = %s,
+                campus = %s,
+                subject = %s,
+                study_type = %s,
+                availability = %s,
+                competencies = %s,
+                needs = %s,
+                bio = %s,
+                updated_at = CURRENT_TIMESTAMP
+            WHERE id = %s
+            """,
+            (
+                display_name,
+                campus,
+                subject,
+                study_type,
+                availability,
+                competencies,
+                needs,
+                bio,
+                user_id
+            )
+        )
+
+    connection.commit()
+    cursor.close()
 
 
 # --------------------------------------------------
@@ -236,11 +311,58 @@ def show_login_page():
 @login_required
 def show_dashboard_page():
     """
-    Visar en enkel dashboardsida för inloggad användare.
+    Visar dashboard för inloggad användare.
     """
     user_id = get_logged_in_user_id()
     profile = get_profile_for_user(user_id)
     return render_template("dashboard.html", profile=profile)
+
+
+@app.route("/profile", methods=["GET", "POST"])
+@login_required
+def show_profile_page():
+    """
+    Visar och uppdaterar användarens profil.
+    """
+    user_id = get_logged_in_user_id()
+
+    if request.method == "POST":
+        display_name = request.form.get("display_name", "").strip()
+        campus = request.form.get("campus", "").strip()
+        subject = request.form.get("subject", "").strip()
+        study_type = request.form.get("study_type", "").strip()
+        availability = request.form.get("availability", "").strip()
+        competencies = request.form.get("competencies", "").strip()
+        needs = request.form.get("needs", "").strip()
+        bio = request.form.get("bio", "").strip()
+
+        image_file = request.files.get("profile_image")
+        image_filename = None
+
+        if image_file and image_file.filename:
+            safe_filename = secure_filename(image_file.filename)
+            image_filename = str(user_id) + "_" + safe_filename
+            image_path = os.path.join(app.config["UPLOAD_FOLDER"], image_filename)
+            image_file.save(image_path)
+
+        update_user_profile(
+            user_id,
+            display_name,
+            campus,
+            subject,
+            study_type,
+            availability,
+            competencies,
+            needs,
+            bio,
+            image_filename
+        )
+
+        flash("Profilen uppdaterades.")
+        return redirect(url_for("show_dashboard_page"))
+
+    profile = get_profile_for_user(user_id)
+    return render_template("profile.html", profile=profile)
 
 
 @app.route("/logout")
@@ -255,4 +377,4 @@ def logout_user():
 
 
 if __name__ == "__main__":
-    app.run(debug=True)
+    app.run(debug=True, port=5050)
