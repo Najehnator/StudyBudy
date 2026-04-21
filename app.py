@@ -22,6 +22,9 @@ os.makedirs(UPLOAD_FOLDER, exist_ok=True)
 def open_database_connection():
     """
     Öppnar en anslutning till PostgreSQL.
+
+    Kravkoppling:
+    - Q-TEK-2: Systemet ska använda en databas för lagring av användardata.
     """
     return psycopg2.connect(
         dbname="ar7094",
@@ -35,6 +38,8 @@ def open_database_connection():
 def get_database_connection():
     """
     Hämtar databasanslutningen för den aktuella sidförfrågan.
+
+    Om ingen anslutning finns för den här förfrågan öppnas en ny.
     """
     if "db_connection" not in g:
         g.db_connection = open_database_connection()
@@ -44,7 +49,7 @@ def get_database_connection():
 @app.teardown_appcontext
 def close_database_connection(error=None):
     """
-    Stänger databasanslutningen när sidan är klar.
+    Stänger databasanslutningen när sidförfrågan är klar.
     """
     connection = g.pop("db_connection", None)
     if connection is not None:
@@ -58,6 +63,9 @@ def close_database_connection(error=None):
 def email_has_valid_format(email_text):
     """
     Kontrollerar om e-postadressen verkar ha rätt format.
+
+    Kravkoppling:
+    - F-ANV-1.3: Systemet ska kontrollera att e-postadressen har korrekt format.
     """
     email_pattern = r"^[^@\s]+@[^@\s]+\.[^@\s]+$"
     return re.match(email_pattern, email_text) is not None
@@ -66,6 +74,9 @@ def email_has_valid_format(email_text):
 def password_is_long_enough(password_text):
     """
     Kontrollerar om lösenordet är minst 8 tecken långt.
+
+    Kravkoppling:
+    - F-ANV-1.4: Systemet ska kontrollera att lösenordet uppfyller säkerhetskrav.
     """
     return len(password_text) >= 8
 
@@ -79,7 +90,7 @@ def get_logged_in_user_id():
 
 def user_is_logged_in():
     """
-    Returnerar True om användaren är inloggad.
+    Returnerar True om användaren är inloggad, annars False.
     """
     return get_logged_in_user_id() is not None
 
@@ -87,6 +98,10 @@ def user_is_logged_in():
 def login_required(view_function):
     """
     Skyddar en route så att bara inloggade användare kommer in.
+
+    Kravkoppling:
+    - Q-SÄK-1: Systemet ska kräva inloggning för användarspecifika funktioner.
+    - Q-SÄK-3: Systemet ska säkerställa att användare bara kommer åt sin egen data.
     """
     @wraps(view_function)
     def wrapped_view(*args, **kwargs):
@@ -104,6 +119,9 @@ def login_required(view_function):
 def find_user_by_email(email):
     """
     Hämtar en användare utifrån e-postadress.
+
+    Kravkoppling:
+    - F-ANV-1.1: Systemet ska kräva en unik e-postadress vid registrering.
     """
     connection = get_database_connection()
     cursor = connection.cursor()
@@ -123,6 +141,11 @@ def find_user_by_email(email):
 def create_new_user(email, password):
     """
     Skapar en ny användare i tabellen users.
+
+    Kravkoppling:
+    - F-ANV-1: Systemet ska tillåta användare att skapa konto.
+    - F-ANV-1.2: Systemet ska kräva lösenord vid registrering.
+    - Q-SÄK-2: Lösenord ska lagras i skyddad form.
     """
     connection = get_database_connection()
     cursor = connection.cursor()
@@ -148,6 +171,9 @@ def create_new_user(email, password):
 def get_profile_for_user(user_id):
     """
     Hämtar profilinformation för en användare.
+
+    Kravkoppling:
+    - F-ANV-2: Systemet ska tillåta användare att skapa och uppdatera en profil.
     """
     connection = get_database_connection()
     cursor = connection.cursor()
@@ -165,10 +191,26 @@ def get_profile_for_user(user_id):
     return profile_row
 
 
-def update_user_profile(user_id, display_name, campus, subject, study_type,
-                        availability, competencies, needs, bio, profile_image):
+def update_user_profile(
+    user_id,
+    display_name,
+    campus,
+    subject,
+    study_type,
+    availability,
+    competencies,
+    needs,
+    bio,
+    profile_image
+):
     """
     Uppdaterar profilinformation för den inloggade användaren.
+
+    Kravkoppling:
+    - F-ANV-2: Profilhantering.
+    - F-ANV-2.1: Användaren ska kunna ange studieinformation.
+    - F-ANV-2.2: Användaren ska kunna ange kompetenser.
+    - Q-SÄK-3: Endast den inloggade användarens profil uppdateras.
     """
     connection = get_database_connection()
     cursor = connection.cursor()
@@ -234,6 +276,9 @@ def update_user_profile(user_id, display_name, campus, subject, study_type,
     cursor.close()
 
 
+# --------------------------------------------------
+# MATCHNING
+# --------------------------------------------------
 
 def get_possible_matches_for_user(current_user_id, campus_filter="", subject_filter=""):
     """
@@ -348,6 +393,9 @@ def show_home_page():
 def show_register_page():
     """
     Visar registreringssidan och hanterar registrering.
+
+    Kravkoppling:
+    - F-ANV-1 till F-ANV-1.5
     """
     if request.method == "POST":
         email = request.form.get("email", "").strip().lower()
@@ -381,6 +429,9 @@ def show_register_page():
 def show_login_page():
     """
     Visar inloggningssidan och hanterar inloggning.
+
+    Kravkoppling:
+    - Q-SÄK-1: Inloggning krävs för användarspecifika funktioner.
     """
     if request.method == "POST":
         email = request.form.get("email", "").strip().lower()
@@ -421,6 +472,11 @@ def show_dashboard_page():
 def show_profile_page():
     """
     Visar och uppdaterar användarens profil.
+
+    Kravkoppling:
+    - F-ANV-2
+    - F-ANV-2.1
+    - F-ANV-2.2
     """
     user_id = get_logged_in_user_id()
 
@@ -433,6 +489,11 @@ def show_profile_page():
         competencies = request.form.get("competencies", "").strip()
         needs = request.form.get("needs", "").strip()
         bio = request.form.get("bio", "").strip()
+
+        if not display_name:
+            flash("Du måste fylla i namn.")
+            profile = get_profile_for_user(user_id)
+            return render_template("profile.html", profile=profile)
 
         image_file = request.files.get("profile_image")
         image_filename = None
@@ -461,6 +522,32 @@ def show_profile_page():
 
     profile = get_profile_for_user(user_id)
     return render_template("profile.html", profile=profile)
+
+
+@app.route("/matches")
+@login_required
+def show_matches_page():
+    """
+    Visar möjliga matchningar och låter användaren filtrera.
+
+    Kravkoppling:
+    - F-MAT-1
+    - F-MAT-1.1
+    - F-MAT-1.2
+    """
+    user_id = get_logged_in_user_id()
+
+    campus_filter = request.args.get("campus", "").strip()
+    subject_filter = request.args.get("subject", "").strip()
+
+    matches = get_possible_matches_for_user(user_id, campus_filter, subject_filter)
+
+    return render_template(
+        "matches.html",
+        matches=matches,
+        campus_filter=campus_filter,
+        subject_filter=subject_filter
+    )
 
 
 @app.route("/logout")
