@@ -6,6 +6,13 @@ import psycopg2
 from flask import Flask, flash, g, redirect, render_template, request, session, url_for
 from werkzeug.security import check_password_hash, generate_password_hash
 from werkzeug.utils import secure_filename
+from dotenv import load_dotenv
+load_dotenv()
+dbname = os.environ.get("dbname")
+user = os.environ.get("user")
+password = os.environ.get("password")
+host = os.environ.get("host")
+port = os.environ.get("port")
 
 app = Flask(__name__)
 app.secret_key = "simple-secret-key"
@@ -27,11 +34,11 @@ def open_database_connection():
     - Q-TEK-2: Systemet ska använda en databas för lagring av användardata.
     """
     return psycopg2.connect(
-        dbname="ar7094",
-        user="ar7094",
-        password="91mnf6tj",
-        host="postgres.mau.se",
-        port="55432"
+        dbname= dbname,
+        user= user,
+        password= password,
+        host= host,
+        port= port
     )
 
 
