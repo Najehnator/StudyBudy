@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="sv">
+<head>
+    <meta charset="UTF-8">
+    <title>Matchningar</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <header>
+        <h1>StudyBuddy</h1>
+        <nav>
+            <a href="{{ url_for('show_dashboard_page') }}">Dashboard</a>
+            <a href="{{ url_for('show_profile_page') }}">Redigera profil</a>
+            <a href="{{ url_for('show_matches_page') }}">Matchningar</a>
+            <a href="{{ url_for('logout_user') }}">Logga ut</a>
+        </nav>
+    </header>
+
+    <main>
+        <section class="card">
+            <h2>Hitta studiekamrater</h2>
+
+            {% with messages = get_flashed_messages() %}
+                {% if messages %}
+                    {% for message in messages %}
+                        <p class="flash-message">{{ message }}</p>
+                    {% endfor %}
+                {% endif %}
+            {% endwith %}
+
+            <form method="GET">
+                <label for="campus">Filtrera på campus</label>
+                <input type="text" id="campus" name="campus" value="{{ campus_filter }}">
+
+                <label for="subject">Filtrera på ämne</label>
+                <input type="text" id="subject" name="subject" value="{{ subject_filter }}">
+
+                <button type="submit">Filtrera</button>
+            </form>
+        </section>
+
+        <section class="card">
+            <h2>Möjliga matchningar</h2>
+
+            {% if matches %}
+                {% for match in matches %}
+                    <div class="match-card">
+                        {% if match[9] %}
+                            <img class="profile-image" src="{{ url_for('static', filename='uploads/' + match[9]) }}" alt="Profilbild">
+                        {% endif %}
+
+                        <p><strong>Namn:</strong> {{ match[1] }}</p>
+                        <p><strong>Campus:</strong> {{ match[2] or 'Ej angivet' }}</p>
+                        <p><strong>Ämne:</strong> {{ match[3] or 'Ej angivet' }}</p>
+                        <p><strong>Studietyp:</strong> {{ match[4] or 'Ej angivet' }}</p>
+                        <p><strong>Tillgänglighet:</strong> {{ match[5] or 'Ej angivet' }}</p>
+                        <p><strong>Kompetenser:</strong> {{ match[6] or 'Ej angivet' }}</p>
+                        <p><strong>Behöver hjälp med:</strong> {{ match[7] or 'Ej angivet' }}</p>
+                        <p><strong>Bio:</strong> {{ match[8] or 'Ej angivet' }}</p>
+                        <p><strong>Matchpoäng:</strong> {{ match[10] }}</p>
+                    </div>
+                {% endfor %}
+            {% else %}
+                <p>Inga matchningar hittades.</p>
+            {% endif %}
+        </section>
+    </main>
+</body>
+</html>
