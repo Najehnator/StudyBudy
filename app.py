@@ -3,16 +3,18 @@ import re
 from functools import wraps
 
 import psycopg2
+from dotenv import load_dotenv
 from flask import Flask, flash, g, redirect, render_template, request, session, url_for
 from werkzeug.security import check_password_hash, generate_password_hash
 from werkzeug.utils import secure_filename
-from dotenv import load_dotenv
+
 load_dotenv()
-dbname = os.environ.get("dbname")
-user = os.environ.get("user")
-password = os.environ.get("password")
-host = os.environ.get("host")
-port = os.environ.get("port")
+
+db_name = os.environ.get("DB_NAME") or os.environ.get("dbname")
+db_user = os.environ.get("DB_USER") or os.environ.get("user")
+db_password = os.environ.get("DB_PASSWORD") or os.environ.get("password")
+db_host = os.environ.get("DB_HOST") or os.environ.get("host")
+db_port = os.environ.get("DB_PORT") or os.environ.get("port")
 
 app = Flask(__name__)
 app.secret_key = "simple-secret-key"
@@ -34,11 +36,11 @@ def open_database_connection():
     - Q-TEK-2: Systemet ska använda en databas för lagring av användardata.
     """
     return psycopg2.connect(
-        dbname= dbname,
-        user= user,
-        password= password,
-        host= host,
-        port= port
+        dbname=db_name,
+        user=db_user,
+        password=db_password,
+        host=db_host,
+        port=db_port
     )
 
 
@@ -113,7 +115,7 @@ def login_required(view_function):
     @wraps(view_function)
     def wrapped_view(*args, **kwargs):
         if not user_is_logged_in():
-            flash("Du måste logga in först.")
+            flash("Du måste logga in först.", "error")
             return redirect(url_for("show_login_page"))
         return view_function(*args, **kwargs)
     return wrapped_view
@@ -422,24 +424,24 @@ def show_register_page():
         password = request.form.get("password", "").strip()
 
         if not email or not password:
-            flash("Du måste fylla i både e-post och lösenord.")
+            flash("Du måste fylla i både e-post och lösenord.", "error")
             return render_template("register.html")
 
         if not email_has_valid_format(email):
-            flash("E-postadressen har inte rätt format.")
+            flash("E-postadressen har inte rätt format.", "error")
             return render_template("register.html")
 
         if not password_is_long_enough(password):
-            flash("Lösenordet måste vara minst 8 tecken långt.")
+            flash("Lösenordet måste vara minst 8 tecken långt.", "error")
             return render_template("register.html")
 
         existing_user = find_user_by_email(email)
         if existing_user:
-            flash("Den e-postadressen är redan registrerad.")
+            flash("Den e-postadressen är redan registrerad.", "error")
             return render_template("register.html")
 
         create_new_user(email, password)
-        flash("Kontot skapades. Du kan nu logga in.")
+        flash("Kontot skapades. Du kan nu logga in.", "success")
         return redirect(url_for("show_login_page"))
 
     return render_template("register.html")
@@ -460,17 +462,17 @@ def show_login_page():
         user_row = find_user_by_email(email)
 
         if user_row is None:
-            flash("Fel e-post eller lösenord.")
+            flash("Fel e-post eller lösenord.", "error")
             return render_template("login.html")
 
         user_id, user_email, stored_password_hash, display_name = user_row
 
         if not check_password_hash(stored_password_hash, password):
-            flash("Fel e-post eller lösenord.")
+            flash("Fel e-post eller lösenord.", "error")
             return render_template("login.html")
 
         session["user_id"] = user_id
-        flash("Du är nu inloggad.")
+        flash("Du är nu inloggad.", "success")
         return redirect(url_for("show_dashboard_page"))
 
     return render_template("login.html")
@@ -511,7 +513,7 @@ def show_profile_page():
         bio = request.form.get("bio", "").strip()
 
         if not display_name:
-            flash("Du måste fylla i namn.")
+            flash("Du måste fylla i namn.", "error")
             profile = get_profile_for_user(user_id)
             return render_template("profile.html", profile=profile)
 
@@ -537,7 +539,7 @@ def show_profile_page():
             image_filename
         )
 
-        flash("Profilen uppdaterades.")
+        flash("Profilen uppdaterades.", "success")
         return redirect(url_for("show_dashboard_page"))
 
     profile = get_profile_for_user(user_id)
@@ -577,9 +579,9 @@ def logout_user():
     Loggar ut användaren.
     """
     session.clear()
-    flash("Du är nu utloggad.")
+    flash("Du är nu utloggad.", "success")
     return redirect(url_for("show_home_page"))
 
 
 if __name__ == "__main__":
-    app.run(debug=True)
+    app.run(debug=True, port=5050)
