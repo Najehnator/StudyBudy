@@ -197,6 +197,19 @@ def get_profile_for_user(user_id):
     cursor.close()
     return profile_row
 
+def profile_is_complete(profile):
+    """
+    Kontrollerar om profilen har tillräcklig information för matchning.
+    """
+    if not profile:
+        return False
+
+    campus = profile[3]
+    subject = profile[4]
+    study_type = profile[5]
+
+    return bool(campus and campus.strip() and subject and subject.strip() and study_type and study_type.strip())
+
 
 def update_user_profile(
     user_id,
