@@ -447,9 +447,18 @@ def show_register_page():
             flash("Den e-postadressen är redan registrerad.", "error")
             return render_template("register.html")
 
-        create_new_user(email, password)
-        flash("Kontot skapades. Du kan nu logga in.", "success")
-        return redirect(url_for("show_login_page"))
+        try:
+            create_new_user(email, password)
+            flash("Kontot skapades. Du kan nu logga in.", "success")
+            return redirect(url_for("show_login_page"))
+        except Exception:
+            connection = g.pop("db_connection", None)
+            if connection is not None:
+                connection.rollback()
+                connection.close()
+
+            flash("Något gick fel när kontot skulle skapas.", "error")
+            return render_template("register.html")
 
     return render_template("register.html")
 
