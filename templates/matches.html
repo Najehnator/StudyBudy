@@ -7,7 +7,7 @@
 </head>
 <body>
     <header>
-        <h1>StudyBuddy</h1>
+        <h1>StudyBudy</h1>
         <nav>
             <a href="{{ url_for('show_dashboard_page') }}">Dashboard</a>
             <a href="{{ url_for('show_profile_page') }}">Redigera profil</a>
@@ -17,18 +17,18 @@
     </header>
 
     <main>
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                {% for category, message in messages %}
+                    <p class="flash-message flash-{{ category }}">{{ message }}</p>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+
         <section class="card">
             <h2>Hitta studiekamrater</h2>
 
-            {% with messages = get_flashed_messages() %}
-                {% if messages %}
-                    {% for message in messages %}
-                        <p class="flash-message">{{ message }}</p>
-                    {% endfor %}
-                {% endif %}
-            {% endwith %}
-
-            <form method="GET">
+            <form method="GET" class="filter-form">
                 <label for="campus">Filtrera på campus</label>
                 <input type="text" id="campus" name="campus" value="{{ campus_filter }}">
 
@@ -39,9 +39,7 @@
             </form>
         </section>
 
-        <section class="card">
-            <h2>Möjliga matchningar</h2>
-
+        <section class="matches-grid">
             {% if matches %}
                 {% for match in matches %}
                     <div class="match-card">
@@ -49,7 +47,7 @@
                             <img class="profile-image" src="{{ url_for('static', filename='uploads/' + match[9]) }}" alt="Profilbild">
                         {% endif %}
 
-                        <p><strong>Namn:</strong> {{ match[1] }}</p>
+                        <h3>{{ match[1] }}</h3>
                         <p><strong>Campus:</strong> {{ match[2] or 'Ej angivet' }}</p>
                         <p><strong>Ämne:</strong> {{ match[3] or 'Ej angivet' }}</p>
                         <p><strong>Studietyp:</strong> {{ match[4] or 'Ej angivet' }}</p>
@@ -57,11 +55,14 @@
                         <p><strong>Kompetenser:</strong> {{ match[6] or 'Ej angivet' }}</p>
                         <p><strong>Behöver hjälp med:</strong> {{ match[7] or 'Ej angivet' }}</p>
                         <p><strong>Bio:</strong> {{ match[8] or 'Ej angivet' }}</p>
-                        <p><strong>Matchpoäng:</strong> {{ match[10] }}</p>
+
+                        <span class="match-score">Matchpoäng: {{ match[10] }}</span>
                     </div>
                 {% endfor %}
             {% else %}
-                <p>Inga matchningar hittades.</p>
+                <div class="no-matches">
+                    Inga matchningar hittades.
+                </div>
             {% endif %}
         </section>
     </main>

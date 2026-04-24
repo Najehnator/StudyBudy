@@ -10,6 +10,8 @@
         <h1>StudyBuddy</h1>
         <nav>
             <a href="{{ url_for('show_dashboard_page') }}">Dashboard</a>
+            <a href="{{ url_for('show_profile_page') }}">Redigera profil</a>
+            <a href="{{ url_for('show_matches_page') }}">Matchningar</a>
             <a href="{{ url_for('logout_user') }}">Logga ut</a>
         </nav>
     </header>
@@ -18,35 +20,43 @@
         <section class="card">
             <h2>Redigera profil</h2>
 
+            {% with messages = get_flashed_messages(with_categories=true) %}
+                {% if messages %}
+                    {% for category, message in messages %}
+                        <p class="flash-message flash-{{ category }}">{{ message }}</p>
+                    {% endfor %}
+                {% endif %}
+            {% endwith %}
+
             <form method="POST" enctype="multipart/form-data">
                 <label for="display_name">Namn</label>
-                <input type="text" id="display_name" name="display_name" value="{{ profile[2] }}" required>
+                <input type="text" id="display_name" name="display_name" value="{{ profile[2] if profile else '' }}">
 
                 <label for="campus">Campus</label>
-                <input type="text" id="campus" name="campus" value="{{ profile[3] or '' }}">
+                <input type="text" id="campus" name="campus" value="{{ profile[3] if profile else '' }}">
 
-                <label for="subject">Ämne / kurs</label>
-                <input type="text" id="subject" name="subject" value="{{ profile[4] or '' }}">
+                <label for="subject">Ämne</label>
+                <input type="text" id="subject" name="subject" value="{{ profile[4] if profile else '' }}">
 
                 <label for="study_type">Studietyp</label>
-                <input type="text" id="study_type" name="study_type" value="{{ profile[5] or '' }}">
+                <input type="text" id="study_type" name="study_type" value="{{ profile[5] if profile else '' }}">
 
                 <label for="availability">Tillgänglighet</label>
-                <textarea id="availability" name="availability">{{ profile[6] or '' }}</textarea>
+                <textarea id="availability" name="availability">{{ profile[6] if profile else '' }}</textarea>
 
                 <label for="competencies">Kompetenser</label>
-                <textarea id="competencies" name="competencies">{{ profile[7] or '' }}</textarea>
+                <textarea id="competencies" name="competencies">{{ profile[7] if profile else '' }}</textarea>
 
                 <label for="needs">Behöver hjälp med</label>
-                <textarea id="needs" name="needs">{{ profile[8] or '' }}</textarea>
+                <textarea id="needs" name="needs">{{ profile[8] if profile else '' }}</textarea>
 
                 <label for="bio">Bio</label>
-                <textarea id="bio" name="bio">{{ profile[9] or '' }}</textarea>
+                <textarea id="bio" name="bio">{{ profile[9] if profile else '' }}</textarea>
 
                 <label for="profile_image">Profilbild</label>
                 <input type="file" id="profile_image" name="profile_image">
 
-                <button type="submit">Spara ändringar</button>
+                <button type="submit">Spara profil</button>
             </form>
         </section>
     </main>
