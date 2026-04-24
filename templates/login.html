@@ -18,10 +18,10 @@
         <section class="card">
             <h2>Logga in</h2>
 
-            {% with messages = get_flashed_messages() %}
+            {% with messages = get_flashed_messages(with_categories=true) %}
                 {% if messages %}
-                    {% for message in messages %}
-                        <p class="flash-message">{{ message }}</p>
+                    {% for category, message in messages %}
+                        <p class="flash-message flash-{{ category }}">{{ message }}</p>
                     {% endfor %}
                 {% endif %}
             {% endwith %}
