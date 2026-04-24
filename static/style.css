@@ -37,6 +37,7 @@ main {
     border-radius: 8px;
     max-width: 700px;
     box-shadow: 0 2px 8px rgba(92, 15, 23, 0.08);
+    margin-bottom: 20px;
 }
 
 label {
@@ -48,7 +49,8 @@ label {
 }
 
 input,
-textarea {
+textarea,
+select {
     width: 100%;
     padding: 10px;
     box-sizing: border-box;
@@ -81,21 +83,94 @@ button:hover,
     background-color: #6f1622;
 }
 
+/* ------------------------------
+   FLASH-MEDDELANDEN
+------------------------------ */
+
 .flash-message {
-    background-color: #f7dede;
-    color: #5c0f17;
     padding: 10px;
     border-radius: 5px;
     margin-bottom: 10px;
-    border: 1px solid #ddb7bc;
+    border: 1px solid transparent;
+    font-weight: bold;
 }
+
+.flash-success {
+    background-color: #dff5e1;
+    color: #1f5c2c;
+    border-color: #a7d7ae;
+}
+
+.flash-error {
+    background-color: #f7dede;
+    color: #5c0f17;
+    border-color: #ddb7bc;
+}
+
+/* ------------------------------
+   PROFILBILD
+------------------------------ */
 
 .profile-image {
     width: 100%;
     max-width: 100%;
     height: auto;
     border-radius: 8px;
-    border: 3px solid #5c0f17;
+    border: 3px solid #45090f;
     margin-bottom: 15px;
     box-sizing: border-box;
+}
+
+/* ------------------------------
+   MATCHES-SIDAN
+------------------------------ */
+
+.match-card {
+    background-color: #fffdfd;
+    border: 1px solid #ddb7bc;
+    border-radius: 8px;
+    padding: 15px;
+    margin-bottom: 20px;
+    box-shadow: 0 2px 8px rgba(92, 15, 23, 0.06);
+}
+
+.match-card h3 {
+    margin-top: 0;
+    color: #5c0f17;
+}
+
+.match-card p {
+    margin: 8px 0;
+}
+
+.match-score {
+    display: inline-block;
+    background-color: #f3d9dd;
+    color: #5c0f17;
+    padding: 6px 10px;
+    border-radius: 20px;
+    font-weight: bold;
+    margin-top: 8px;
+}
+
+.matches-grid {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.filter-form {
+    display: block;
+}
+
+.filter-form button {
+    margin-top: 10px;
+}
+
+.no-matches {
+    background-color: #fffdfd;
+    border: 1px dashed #c9b3b3;
+    border-radius: 8px;
+    padding: 15px;
+    color: #5c0f17;
 }
