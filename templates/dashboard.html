@@ -7,11 +7,11 @@
 </head>
 <body>
     <header>
-        <h1>StudyBuddy</h1>
+        <h1>StudyBudy</h1>
         <nav>
             <a href="{{ url_for('show_dashboard_page') }}">Dashboard</a>
-            <a href="{{ url_for('show_matches_page') }}">Matchningar</a>
             <a href="{{ url_for('show_profile_page') }}">Redigera profil</a>
+            <a href="{{ url_for('show_matches_page') }}">Matchningar</a>
             <a href="{{ url_for('logout_user') }}">Logga ut</a>
         </nav>
     </header>
@@ -20,10 +20,10 @@
         <section class="card">
             <h2>Dashboard</h2>
 
-            {% with messages = get_flashed_messages() %}
+            {% with messages = get_flashed_messages(with_categories=true) %}
                 {% if messages %}
-                    {% for message in messages %}
-                        <p class="flash-message">{{ message }}</p>
+                    {% for category, message in messages %}
+                        <p class="flash-message flash-{{ category }}">{{ message }}</p>
                     {% endfor %}
                 {% endif %}
             {% endwith %}
@@ -33,8 +33,8 @@
                     <img class="profile-image" src="{{ url_for('static', filename='uploads/' + profile[10]) }}" alt="Profilbild">
                 {% endif %}
 
-                <p><strong>Namn:</strong> {{ profile[2] }}</p>
-                <p><strong>E-post:</strong> {{ profile[1] }}</p>
+                <p><strong>Namn:</strong> {{ profile[2] or 'Ej angivet' }}</p>
+                <p><strong>E-post:</strong> {{ profile[1] or 'Ej angivet' }}</p>
                 <p><strong>Campus:</strong> {{ profile[3] or 'Ej angivet' }}</p>
                 <p><strong>Ämne:</strong> {{ profile[4] or 'Ej angivet' }}</p>
                 <p><strong>Studietyp:</strong> {{ profile[5] or 'Ej angivet' }}</p>
