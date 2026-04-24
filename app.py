@@ -537,29 +537,42 @@ def show_profile_page():
         image_filename = None
 
         if image_file and image_file.filename:
+            if not allowed_file(image_file.filename):
+                flash("Du får bara ladda upp JPG- eller PNG-bilder.", "error")
+                profile = get_profile_for_user(user_id)
+                return render_template("profile.html", profile=profile)
+
             safe_filename = secure_filename(image_file.filename)
             image_filename = str(user_id) + "_" + safe_filename
             image_path = os.path.join(app.config["UPLOAD_FOLDER"], image_filename)
             image_file.save(image_path)
 
-        update_user_profile(
-            user_id,
-            display_name,
-            campus,
-            subject,
-            study_type,
-            availability,
-            competencies,
-            needs,
-            bio,
-            image_filename
-        )
+        try:
+            update_user_profile(
+                user_id,
+                display_name,
+                campus,
+                subject,
+                study_type,
+                availability,
+                competencies,
+                needs,
+                bio,
+                image_filename
+            )
 
-        flash("Profilen uppdaterades.", "success")
-        return redirect(url_for("show_dashboard_page"))
+            flash("Profilen uppdaterades.", "success")
+            return redirect(url_for("show_dashboard_page"))
 
-    profile = get_profile_for_user(user_id)
-    return render_template("profile.html", profile=profile)
+        except Exception:
+            connection = g.pop("db_connection", None)
+            if connection is not None:
+                connection.rollback()
+                connection.close()
+
+            flash("Något gick fel när profilen skulle uppdateras.", "error")
+            profile = get_profile_for_user(user_id)
+            return render_template("profile.html", profile=profile)
 
 
 @app.route("/matches")
