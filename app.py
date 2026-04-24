@@ -89,6 +89,13 @@ def password_is_long_enough(password_text):
     """
     return len(password_text) >= 8
 
+def allowed_file(filename):
+    """
+    Kontrollerar om filen har en tillåten filändelse.
+    """
+    allowed_extensions = {"png", "jpg", "jpeg"}
+    return "." in filename and filename.rsplit(".", 1)[1].lower() in allowed_extensions
+
 
 def get_logged_in_user_id():
     """
@@ -198,6 +205,19 @@ def get_profile_for_user(user_id):
     profile_row = cursor.fetchone()
     cursor.close()
     return profile_row
+
+def profile_is_complete(profile):
+    """
+    Kontrollerar om profilen har tillräcklig information för matchning.
+    """
+    if not profile:
+        return False
+
+    campus = profile[3]
+    subject = profile[4]
+    study_type = profile[5]
+
+    return bool(campus and campus.strip() and subject and subject.strip() and study_type and study_type.strip())
 
 
 def update_user_profile(
