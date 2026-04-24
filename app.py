@@ -89,6 +89,13 @@ def password_is_long_enough(password_text):
     """
     return len(password_text) >= 8
 
+def allowed_file(filename):
+    """
+    Kontrollerar om filen har en tillåten filändelse.
+    """
+    allowed_extensions = {"png", "jpg", "jpeg"}
+    return "." in filename and filename.rsplit(".", 1)[1].lower() in allowed_extensions
+
 
 def get_logged_in_user_id():
     """
