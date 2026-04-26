@@ -573,7 +573,9 @@ def show_profile_page():
             flash("Något gick fel när profilen skulle uppdateras.", "error")
             profile = get_profile_for_user(user_id)
             return render_template("profile.html", profile=profile)
-
+     #GET-request
+    profile = get_profile_for_user(user_id)
+    return render_template("profile.html", profile=profile)
 
 @app.route("/matches")
 @login_required
