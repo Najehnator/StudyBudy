@@ -17,8 +17,6 @@ Projektets repository finns här:
 
 (https://github.com/Najehnator/StudyBudy.git)
 
-Den granskande gruppen ska utgå från den kod som finns i repositoryt vid tiden för granskningen.
-
 ---
 
 ## 2. Tekniker som används
@@ -47,6 +45,9 @@ För att kunna köra projektet behöver ni ha följande installerat:
   - psycopg2-binary
   - Werkzeug
 
+- .env fil behöver skapas för databasen. 
+    kontaka Najeh för innehåll och information.
 Installera biblioteken med:
 
 pip install Flask psycopg2-binary Werkzeug
+
