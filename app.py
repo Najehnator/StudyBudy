@@ -405,7 +405,59 @@ def get_possible_matches_for_user(current_user_id, campus_filter="", subject_fil
     cursor.close()
     return rows
 
+def save_user_interest(from_user_id, to_user_id, is_interested):
+    """
+    Sparar om den inloggade användaren är intresserad eller inte intresserad
+    av en annan användare.
 
+    Kravkoppling:
+    - F-INT-1: Systemet ska tillåta användare att markera intresse eller ej intresse.
+    """
+    connection = get_database_connection()
+    cursor = connection.cursor()
+
+    cursor.execute(
+        """
+        INSERT INTO interests (from_user_id, to_user_id, is_interested)
+        VALUES (%s, %s, %s)
+        ON CONFLICT (from_user_id, to_user_id)
+        DO UPDATE SET
+            is_interested = EXCLUDED.is_interested,
+            updated_at = CURRENT_TIMESTAMP
+        """,
+        (from_user_id, to_user_id, is_interested)
+    )
+
+    connection.commit()
+    cursor.close()
+
+
+def other_user_is_interested_in_me(other_user_id, current_user_id):
+    """
+    Kontrollerar om den andra användaren redan har visat intresse
+    för den inloggade användaren.
+
+    Kravkoppling:
+    - F-INT-1.1: Matchning vid ömsesidigt intresse.
+    """
+    connection = get_database_connection()
+    cursor = connection.cursor()
+
+    cursor.execute(
+        """
+        SELECT id
+        FROM interests
+        WHERE from_user_id = %s
+          AND to_user_id = %s
+          AND is_interested = TRUE
+        """,
+        (other_user_id, current_user_id)
+    )
+
+    interest_row = cursor.fetchone()
+    cursor.close()
+
+    return interest_row is not None
 # --------------------------------------------------
 # ROUTES
 # --------------------------------------------------
@@ -581,27 +633,82 @@ def show_profile_page():
 @login_required
 def show_matches_page():
     """
-    Visar möjliga matchningar och låter användaren filtrera.
+    Visar möjliga matchningar, sökning och filtrering.
 
     Kravkoppling:
     - F-MAT-1
     - F-MAT-1.1
     - F-MAT-1.2
+    - F-INT-1
     """
     user_id = get_logged_in_user_id()
 
     campus_filter = request.args.get("campus", "").strip()
     subject_filter = request.args.get("subject", "").strip()
+    search_query = request.args.get("search", "").strip()
 
-    matches = get_possible_matches_for_user(user_id, campus_filter, subject_filter)
+    matches = get_possible_matches_for_user(
+        user_id,
+        campus_filter,
+        subject_filter,
+        search_query
+    )
 
     return render_template(
         "matches.html",
         matches=matches,
         campus_filter=campus_filter,
-        subject_filter=subject_filter
+        subject_filter=subject_filter,
+        search_query=search_query
     )
 
+
+@app.route("/swipe/<int:to_user_id>/<string:action>", methods=["POST"])
+@login_required
+def handle_swipe(to_user_id, action):
+    """
+    Hanterar swipe/intresse för en annan användare.
+
+    action kan vara:
+    - like
+    - dislike
+
+    Kravkoppling:
+    - F-INT-1: Visa intresse eller ej intresse.
+    - F-INT-1.1: Matchning vid ömsesidigt intresse.
+    """
+    current_user_id = get_logged_in_user_id()
+
+    if current_user_id == to_user_id:
+        flash("Du kan inte swipa på dig själv.", "error")
+        return redirect(url_for("show_matches_page"))
+
+    if action not in ["like", "dislike"]:
+        flash("Ogiltig swipe-handling.", "error")
+        return redirect(url_for("show_matches_page"))
+
+    is_interested = action == "like"
+
+    try:
+        save_user_interest(current_user_id, to_user_id, is_interested)
+
+        if is_interested and other_user_is_interested_in_me(to_user_id, current_user_id):
+            create_match_if_not_exists(current_user_id, to_user_id)
+            flash("Det blev en matchning!", "success")
+        elif is_interested:
+            flash("Du visade intresse.", "success")
+        else:
+            flash("Du valde att inte visa intresse.", "success")
+
+    except Exception:
+        connection = g.pop("db_connection", None)
+        if connection is not None:
+            connection.rollback()
+            connection.close()
+
+        flash("Något gick fel när ditt val skulle sparas.", "error")
+
+    return redirect(url_for("show_matches_page"))
 
 @app.route("/logout")
 @login_required
