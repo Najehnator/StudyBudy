@@ -666,7 +666,7 @@ FodyWeavers.xsd
 *.cab
 *.msi
 *.msix
-*.msm
+*.msmfenv
 *.msp
 # General
 .DS_Store
