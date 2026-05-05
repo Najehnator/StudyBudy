@@ -491,6 +491,42 @@ def other_user_is_interested_in_me(other_user_id, current_user_id):
     cursor.close()
 
     return interest_row is not None
+
+def create_match_if_not_exists(user_a_id, user_b_id):
+    """
+    Skapar en match mellan två användare om den inte redan finns.
+
+    För att undvika dubbletter sparas alltid lägsta id först.
+    Exempel:
+    user_a_id = 2, user_b_id = 5
+    sparas som:
+    user_a_id = 2, user_b_id = 5
+
+    user_a_id = 5, user_b_id = 2
+    sparas också som:
+    user_a_id = 2, user_b_id = 5
+
+        Kravkoppling:
+    - F-INT-1.1: Systemet ska skapa en match när två användare har visat ömsesidigt intresse.
+    """
+    first_user_id = min(user_a_id, user_b_id)
+    second_user_id = max(user_a_id, user_b_id)
+
+    connection = get_database_connection()
+    cursor = connection.cursor()
+
+    cursor.execute(
+    """
+    INSERT INTO matches (user_a_id, user_b_id)
+    VALUES (%s, %s)
+    ON CONFLICT (user_a_id, user_b_id)
+    DO NOTHING
+    """,
+    (first_user_id, second_user_id)
+    )
+
+    connection.commit()
+    cursor.close()
 # --------------------------------------------------
 # ROUTES
 # --------------------------------------------------
