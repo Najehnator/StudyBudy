@@ -309,7 +309,7 @@ def update_user_profile(
 # MATCHNING
 # --------------------------------------------------
 
-def get_possible_matches_for_user(current_user_id, campus_filter="", subject_filter=""):
+def get_possible_matches_for_user(current_user_id, campus_filter="", subject_filter="", search_query=""):
     """
     Hämtar möjliga studiekamrater för den inloggade användaren.
 
@@ -324,6 +324,7 @@ def get_possible_matches_for_user(current_user_id, campus_filter="", subject_fil
     - F-MAT-1: Systemet ska matcha användare baserat på behov och kompetenser.
     - F-MAT-1.1: Systemet ska möjliggöra filtrering efter campus.
     - F-MAT-1.2: Systemet ska möjliggöra filtrering efter ämne.
+    - F-INT-1: Systemet ska tillåta användare att markera intresse eller ej intresse.
     """
     connection = get_database_connection()
     cursor = connection.cursor()
@@ -383,9 +384,17 @@ def get_possible_matches_for_user(current_user_id, campus_filter="", subject_fil
             ON my_user.id <> other_user.id
         WHERE my_user.id = %s
           AND other_user.id <> %s
+
+          -- Visa inte personer som jag redan har swipat på
+          AND NOT EXISTS (
+              SELECT 1
+              FROM interests
+              WHERE interests.from_user_id = %s
+                AND interests.to_user_id = other_user.id
+          )
     """
 
-    query_values = [current_user_id, current_user_id]
+    query_values = [current_user_id, current_user_id, current_user_id]
 
     if campus_filter:
         sql_query += " AND other_user.campus ILIKE %s"
@@ -395,6 +404,29 @@ def get_possible_matches_for_user(current_user_id, campus_filter="", subject_fil
         sql_query += " AND other_user.subject ILIKE %s"
         query_values.append(f"%{subject_filter}%")
 
+    if search_query:
+        sql_query += """
+            AND (
+                other_user.display_name ILIKE %s
+                OR other_user.campus ILIKE %s
+                OR other_user.subject ILIKE %s
+                OR other_user.study_type ILIKE %s
+                OR other_user.competencies ILIKE %s
+                OR other_user.needs ILIKE %s
+                OR other_user.bio ILIKE %s
+            )
+        """
+        search_value = f"%{search_query}%"
+        query_values.extend([
+            search_value,
+            search_value,
+            search_value,
+            search_value,
+            search_value,
+            search_value,
+            search_value
+        ])
+
     sql_query += """
         ORDER BY match_score DESC,
                  other_user.display_name ASC
@@ -403,6 +435,7 @@ def get_possible_matches_for_user(current_user_id, campus_filter="", subject_fil
     cursor.execute(sql_query, tuple(query_values))
     rows = cursor.fetchall()
     cursor.close()
+
     return rows
 
 
