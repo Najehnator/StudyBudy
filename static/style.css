@@ -226,12 +226,21 @@ button:hover,
 }
 
 .dislike-button {
-    background-color: #eeeeee;
+    background-color: #e74c3c;
+    color: white;
+}
+
+.dislike-button:hover {
+    background-color: #c0392b;
 }
 
 .like-button {
-    background-color: #2ecc71;
+    background-color: #27ae60;
     color: white;
+}
+
+.like-button:hover {
+    background-color: #1e8449;
 }
 
 @media (max-width: 600px) {
