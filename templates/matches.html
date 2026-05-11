@@ -12,6 +12,7 @@
             <a href="{{ url_for('show_dashboard_page') }}">Dashboard</a>
             <a href="{{ url_for('show_profile_page') }}">Redigera profil</a>
             <a href="{{ url_for('show_matches_page') }}">Matchningar</a>
+            <a href="{{ url_for('show_my_matches_page') }}">Mina matchningar</a>
             <a href="{{ url_for('logout_user') }}">Logga ut</a>
         </nav>
 
@@ -108,7 +109,7 @@
                 {% endfor %}
             {% else %}
                 <div class="no-matches">
-                    Inga profiler hittades.
+                    Inga matchningar hittades.
                 </div>
             {% endif %}
         </section>
