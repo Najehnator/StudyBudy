@@ -14,6 +14,52 @@
             <a href="{{ url_for('show_matches_page') }}">Matchningar</a>
             <a href="{{ url_for('logout_user') }}">Logga ut</a>
         </nav>
+
+        <form method="GET" class="top-search-form">
+            <div class="top-search-row">
+                <input
+                    type="text"
+                    id="search"
+                    name="search"
+                    placeholder="Sök efter namn, ämne, campus eller kompetenser..."
+                    value="{{ search_query }}"
+                >
+
+                <div class="filter-wrapper">
+                    <button type="button" class="filter-button" onclick="toggleFilterDropdown()">
+                        Filtrera
+                    </button>
+
+                    <div id="filter-dropdown" class="filter-dropdown">
+                        <label for="subject">Ämne</label>
+                        <input
+                            type="text"
+                            id="subject"
+                            name="subject"
+                            placeholder="Exempel: Programmering"
+                            value="{{ subject_filter }}"
+                        >
+
+                        <label for="campus">Campus</label>
+                        <input
+                            type="text"
+                            id="campus"
+                            name="campus"
+                            placeholder="Exempel: Malmö"
+                            value="{{ campus_filter }}"
+                        >
+
+                        <button type="submit" class="apply-filter-button">
+                            Använd filter
+                        </button>
+                    </div>
+                </div>
+
+                <button type="submit" class="search-button">
+                    Sök
+                </button>
+            </div>
+        </form>
     </header>
 
     <main>
@@ -25,64 +71,12 @@
             {% endif %}
         {% endwith %}
 
-        <section class="card">
-            <h2>Dina möjliga matchningar</h2>
-
-            <form method="GET" class="search-filter-form">
-                <div class="search-row">
-                    <input 
-                        type="text" 
-                        id="search" 
-                        name="search" 
-                        placeholder="Sök efter namn, ämne, campus, kompetenser..." 
-                        value="{{ search_query }}"
-                    >
-
-                    <button type="button" class="filter-toggle" onclick="toggleFilterMenu()">
-                        Filtrera
-                    </button>
-
-                    <button type="submit" class="search-button">
-                        Sök
-                    </button>
-                </div>
-
-                <div id="filter-menu" class="filter-dropdown">
-                    <label for="campus">Filtrera på campus</label>
-                    <input 
-                        type="text" 
-                        id="campus" 
-                        name="campus" 
-                        placeholder="Exempel: Malmö" 
-                        value="{{ campus_filter }}"
-                    >
-
-                    <label for="subject">Filtrera på ämne</label>
-                    <input 
-                        type="text" 
-                        id="subject" 
-                        name="subject" 
-                        placeholder="Exempel: Programmering" 
-                        value="{{ subject_filter }}"
-                    >
-
-                    <button type="submit" class="apply-filter-button">
-                        Använd filter
-                    </button>
-                </div>
-            </form>
-        </section>
-
         <section class="matches-grid">
             {% if matches %}
                 {% for match in matches %}
                     <div class="match-card">
                         {% if match[9] %}
                             <img class="profile-image" src="{{ url_for('static', filename='uploads/' + match[9]) }}" alt="Profilbild">
-                        {% else %}
-                            <div class="profile-placeholder">
-                                Ingen profilbild
-                            </div>
                         {% endif %}
 
                         <h3>{{ match[1] }}</h3>
@@ -121,13 +115,13 @@
     </main>
 
     <script>
-        function toggleFilterMenu() {
-            const filterMenu = document.getElementById("filter-menu");
+        function toggleFilterDropdown() {
+            const dropdown = document.getElementById("filter-dropdown");
 
-            if (filterMenu.style.display === "block") {
-                filterMenu.style.display = "none";
+            if (dropdown.style.display === "block") {
+                dropdown.style.display = "none";
             } else {
-                filterMenu.style.display = "block";
+                dropdown.style.display = "block";
             }
         }
     </script>
