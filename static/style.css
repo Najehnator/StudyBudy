@@ -1,11 +1,18 @@
 body {
-    font-family: Arial, sans-serif;
+    font-family: "Trebuchet MS", "Segoe UI", Arial, sans-serif;
     background-color: #f8f4f4;
     margin: 0;
     padding: 0;
     color: #2b1b1b;
 }
 
+input,
+textarea,
+select,
+button,
+.button-link {
+    font-family: "Trebuchet MS", "Segoe UI", Arial, sans-serif;
+}
 /* ------------------------------
    HEADER / NAV
 ------------------------------ */
