@@ -31,9 +31,6 @@ os.makedirs(UPLOAD_FOLDER, exist_ok=True)
 def open_database_connection():
     """
     Öppnar en anslutning till PostgreSQL.
-
-    Kravkoppling:
-    - Q-TEK-2: Systemet ska använda en databas för lagring av användardata.
     """
     return psycopg2.connect(
         dbname=db_name,
@@ -47,8 +44,6 @@ def open_database_connection():
 def get_database_connection():
     """
     Hämtar databasanslutningen för den aktuella sidförfrågan.
-
-    Om ingen anslutning finns för den här förfrågan öppnas en ny.
     """
     if "db_connection" not in g:
         g.db_connection = open_database_connection()
@@ -72,9 +67,6 @@ def close_database_connection(error=None):
 def email_has_valid_format(email_text):
     """
     Kontrollerar om e-postadressen verkar ha rätt format.
-
-    Kravkoppling:
-    - F-ANV-1.3: Systemet ska kontrollera att e-postadressen har korrekt format.
     """
     email_pattern = r"^[^@\s]+@[^@\s]+\.[^@\s]+$"
     return re.match(email_pattern, email_text) is not None
@@ -83,11 +75,9 @@ def email_has_valid_format(email_text):
 def password_is_long_enough(password_text):
     """
     Kontrollerar om lösenordet är minst 8 tecken långt.
-
-    Kravkoppling:
-    - F-ANV-1.4: Systemet ska kontrollera att lösenordet uppfyller säkerhetskrav.
     """
     return len(password_text) >= 8
+
 
 def allowed_file(filename):
     """
@@ -106,18 +96,14 @@ def get_logged_in_user_id():
 
 def user_is_logged_in():
     """
-    Returnerar True om användaren är inloggad, annars False.
+    Returnerar True om användaren är inloggad.
     """
     return get_logged_in_user_id() is not None
 
 
 def login_required(view_function):
     """
-    Skyddar en route så att bara inloggade användare kommer in.
-
-    Kravkoppling:
-    - Q-SÄK-1: Systemet ska kräva inloggning för användarspecifika funktioner.
-    - Q-SÄK-3: Systemet ska säkerställa att användare bara kommer åt sin egen data.
+    Skyddar routes så att bara inloggade användare kommer in.
     """
     @wraps(view_function)
     def wrapped_view(*args, **kwargs):
@@ -135,12 +121,10 @@ def login_required(view_function):
 def find_user_by_email(email):
     """
     Hämtar en användare utifrån e-postadress.
-
-    Kravkoppling:
-    - F-ANV-1.1: Systemet ska kräva en unik e-postadress vid registrering.
     """
     connection = get_database_connection()
     cursor = connection.cursor()
+
     cursor.execute(
         """
         SELECT id, email, password_hash, display_name
@@ -149,19 +133,16 @@ def find_user_by_email(email):
         """,
         (email,)
     )
+
     user_row = cursor.fetchone()
     cursor.close()
+
     return user_row
 
 
 def create_new_user(email, password):
     """
-    Skapar en ny användare i tabellen users.
-
-    Kravkoppling:
-    - F-ANV-1: Systemet ska tillåta användare att skapa konto.
-    - F-ANV-1.2: Systemet ska kräva lösenord vid registrering.
-    - Q-SÄK-2: Lösenord ska lagras i skyddad form.
+    Skapar en ny användare.
     """
     connection = get_database_connection()
     cursor = connection.cursor()
@@ -179,20 +160,20 @@ def create_new_user(email, password):
     )
 
     new_user_id = cursor.fetchone()[0]
+
     connection.commit()
     cursor.close()
+
     return new_user_id
 
 
 def get_profile_for_user(user_id):
     """
     Hämtar profilinformation för en användare.
-
-    Kravkoppling:
-    - F-ANV-2: Systemet ska tillåta användare att skapa och uppdatera en profil.
     """
     connection = get_database_connection()
     cursor = connection.cursor()
+
     cursor.execute(
         """
         SELECT id, email, display_name, campus, subject, study_type,
@@ -202,9 +183,12 @@ def get_profile_for_user(user_id):
         """,
         (user_id,)
     )
+
     profile_row = cursor.fetchone()
     cursor.close()
+
     return profile_row
+
 
 def profile_is_complete(profile):
     """
@@ -217,7 +201,11 @@ def profile_is_complete(profile):
     subject = profile[4]
     study_type = profile[5]
 
-    return bool(campus and campus.strip() and subject and subject.strip() and study_type and study_type.strip())
+    return bool(
+        campus and campus.strip()
+        and subject and subject.strip()
+        and study_type and study_type.strip()
+    )
 
 
 def update_user_profile(
@@ -233,13 +221,7 @@ def update_user_profile(
     profile_image
 ):
     """
-    Uppdaterar profilinformation för den inloggade användaren.
-
-    Kravkoppling:
-    - F-ANV-2: Profilhantering.
-    - F-ANV-2.1: Användaren ska kunna ange studieinformation.
-    - F-ANV-2.2: Användaren ska kunna ange kompetenser.
-    - Q-SÄK-3: Endast den inloggade användarens profil uppdateras.
+    Uppdaterar användarens profil.
     """
     connection = get_database_connection()
     cursor = connection.cursor()
@@ -312,19 +294,6 @@ def update_user_profile(
 def get_possible_matches_for_user(current_user_id, campus_filter="", subject_filter="", search_query=""):
     """
     Hämtar möjliga studiekamrater för den inloggade användaren.
-
-    Matchningen hålls enkel:
-    - samma ämne ger poäng
-    - samma campus ger poäng
-    - samma studietyp ger poäng
-    - om den andres kompetenser matchar mina behov ger det poäng
-    - om mina kompetenser matchar den andres behov ger det poäng
-
-    Kravkoppling:
-    - F-MAT-1: Systemet ska matcha användare baserat på behov och kompetenser.
-    - F-MAT-1.1: Systemet ska möjliggöra filtrering efter campus.
-    - F-MAT-1.2: Systemet ska möjliggöra filtrering efter ämne.
-    - F-INT-1: Systemet ska tillåta användare att markera intresse eller ej intresse.
     """
     connection = get_database_connection()
     cursor = connection.cursor()
@@ -385,7 +354,6 @@ def get_possible_matches_for_user(current_user_id, campus_filter="", subject_fil
         WHERE my_user.id = %s
           AND other_user.id <> %s
 
-          -- Visa inte personer som jag redan har swipat på
           AND NOT EXISTS (
               SELECT 1
               FROM interests
@@ -438,13 +406,10 @@ def get_possible_matches_for_user(current_user_id, campus_filter="", subject_fil
 
     return rows
 
+
 def save_user_interest(from_user_id, to_user_id, is_interested):
     """
-    Sparar om den inloggade användaren är intresserad eller inte intresserad
-    av en annan användare.
-
-    Kravkoppling:
-    - F-INT-1: Systemet ska tillåta användare att markera intresse eller ej intresse.
+    Sparar om användaren är intresserad eller inte.
     """
     connection = get_database_connection()
     cursor = connection.cursor()
@@ -467,11 +432,7 @@ def save_user_interest(from_user_id, to_user_id, is_interested):
 
 def other_user_is_interested_in_me(other_user_id, current_user_id):
     """
-    Kontrollerar om den andra användaren redan har visat intresse
-    för den inloggade användaren.
-
-    Kravkoppling:
-    - F-INT-1.1: Matchning vid ömsesidigt intresse.
+    Kontrollerar om den andra användaren redan har visat intresse.
     """
     connection = get_database_connection()
     cursor = connection.cursor()
@@ -492,22 +453,10 @@ def other_user_is_interested_in_me(other_user_id, current_user_id):
 
     return interest_row is not None
 
+
 def create_match_if_not_exists(user_a_id, user_b_id):
     """
     Skapar en match mellan två användare om den inte redan finns.
-
-    För att undvika dubbletter sparas alltid lägsta id först.
-    Exempel:
-    user_a_id = 2, user_b_id = 5
-    sparas som:
-    user_a_id = 2, user_b_id = 5
-
-    user_a_id = 5, user_b_id = 2
-    sparas också som:
-    user_a_id = 2, user_b_id = 5
-
-        Kravkoppling:
-    - F-INT-1.1: Systemet ska skapa en match när två användare har visat ömsesidigt intresse.
     """
     first_user_id = min(user_a_id, user_b_id)
     second_user_id = max(user_a_id, user_b_id)
@@ -516,17 +465,146 @@ def create_match_if_not_exists(user_a_id, user_b_id):
     cursor = connection.cursor()
 
     cursor.execute(
-    """
-    INSERT INTO matches (user_a_id, user_b_id)
-    VALUES (%s, %s)
-    ON CONFLICT (user_a_id, user_b_id)
-    DO NOTHING
-    """,
-    (first_user_id, second_user_id)
+        """
+        INSERT INTO matches (user_a_id, user_b_id)
+        VALUES (%s, %s)
+        ON CONFLICT (user_a_id, user_b_id)
+        DO NOTHING
+        """,
+        (first_user_id, second_user_id)
     )
 
     connection.commit()
     cursor.close()
+
+
+def get_my_confirmed_matches(current_user_id):
+    """
+    Hämtar alla bekräftade matchningar för den inloggade användaren.
+    """
+    connection = get_database_connection()
+    cursor = connection.cursor()
+
+    cursor.execute(
+        """
+        SELECT
+            matches.id,
+            other_user.id,
+            other_user.display_name,
+            other_user.email,
+            other_user.campus,
+            other_user.subject,
+            other_user.study_type,
+            other_user.availability,
+            other_user.competencies,
+            other_user.needs,
+            other_user.bio,
+            other_user.profile_image,
+            matches.created_at
+        FROM matches
+        JOIN users AS other_user
+            ON (
+                (matches.user_a_id = %s AND matches.user_b_id = other_user.id)
+                OR
+                (matches.user_b_id = %s AND matches.user_a_id = other_user.id)
+            )
+        ORDER BY matches.created_at DESC
+        """,
+        (current_user_id, current_user_id)
+    )
+
+    rows = cursor.fetchall()
+    cursor.close()
+
+    return rows
+
+
+# --------------------------------------------------
+# CHATT
+# --------------------------------------------------
+
+def get_match_for_user(match_id, current_user_id):
+    """
+    Hämtar en match om den inloggade användaren är en del av matchningen.
+    """
+    connection = get_database_connection()
+    cursor = connection.cursor()
+
+    cursor.execute(
+        """
+        SELECT
+            matches.id,
+            matches.user_a_id,
+            matches.user_b_id,
+            other_user.display_name
+        FROM matches
+        JOIN users AS other_user
+            ON (
+                (matches.user_a_id = %s AND matches.user_b_id = other_user.id)
+                OR
+                (matches.user_b_id = %s AND matches.user_a_id = other_user.id)
+            )
+        WHERE matches.id = %s
+          AND (%s = matches.user_a_id OR %s = matches.user_b_id)
+        """,
+        (current_user_id, current_user_id, match_id, current_user_id, current_user_id)
+    )
+
+    match_row = cursor.fetchone()
+    cursor.close()
+
+    return match_row
+
+
+def get_messages_for_match(match_id):
+    """
+    Hämtar alla meddelanden för en viss match.
+    """
+    connection = get_database_connection()
+    cursor = connection.cursor()
+
+    cursor.execute(
+        """
+        SELECT
+            messages.id,
+            messages.sender_user_id,
+            users.display_name,
+            messages.message_text,
+            messages.created_at
+        FROM messages
+        JOIN users
+            ON messages.sender_user_id = users.id
+        WHERE messages.match_id = %s
+        ORDER BY messages.created_at ASC
+        """,
+        (match_id,)
+    )
+
+    rows = cursor.fetchall()
+    cursor.close()
+
+    return rows
+
+
+def save_message(match_id, sender_user_id, message_text):
+    """
+    Sparar ett nytt chattmeddelande.
+    """
+    connection = get_database_connection()
+    cursor = connection.cursor()
+
+    cursor.execute(
+        """
+        INSERT INTO messages (match_id, sender_user_id, message_text)
+        VALUES (%s, %s, %s)
+        """,
+        (match_id, sender_user_id, message_text)
+    )
+
+    connection.commit()
+    cursor.close()
+
+
 # --------------------------------------------------
 # ROUTES
 # --------------------------------------------------
@@ -543,9 +621,6 @@ def show_home_page():
 def show_register_page():
     """
     Visar registreringssidan och hanterar registrering.
-
-    Kravkoppling:
-    - F-ANV-1 till F-ANV-1.5
     """
     if request.method == "POST":
         email = request.form.get("email", "").strip().lower()
@@ -564,6 +639,7 @@ def show_register_page():
             return render_template("register.html")
 
         existing_user = find_user_by_email(email)
+
         if existing_user:
             flash("Den e-postadressen är redan registrerad.", "error")
             return render_template("register.html")
@@ -572,6 +648,7 @@ def show_register_page():
             create_new_user(email, password)
             flash("Kontot skapades. Du kan nu logga in.", "success")
             return redirect(url_for("show_login_page"))
+
         except Exception:
             connection = g.pop("db_connection", None)
             if connection is not None:
@@ -588,9 +665,6 @@ def show_register_page():
 def show_login_page():
     """
     Visar inloggningssidan och hanterar inloggning.
-
-    Kravkoppling:
-    - Q-SÄK-1: Inloggning krävs för användarspecifika funktioner.
     """
     if request.method == "POST":
         email = request.form.get("email", "").strip().lower()
@@ -609,6 +683,7 @@ def show_login_page():
             return render_template("login.html")
 
         session["user_id"] = user_id
+
         flash("Du är nu inloggad.", "success")
         return redirect(url_for("show_dashboard_page"))
 
@@ -623,6 +698,7 @@ def show_dashboard_page():
     """
     user_id = get_logged_in_user_id()
     profile = get_profile_for_user(user_id)
+
     return render_template("dashboard.html", profile=profile)
 
 
@@ -631,11 +707,6 @@ def show_dashboard_page():
 def show_profile_page():
     """
     Visar och uppdaterar användarens profil.
-
-    Kravkoppling:
-    - F-ANV-2
-    - F-ANV-2.1
-    - F-ANV-2.2
     """
     user_id = get_logged_in_user_id()
 
@@ -694,21 +765,17 @@ def show_profile_page():
             flash("Något gick fel när profilen skulle uppdateras.", "error")
             profile = get_profile_for_user(user_id)
             return render_template("profile.html", profile=profile)
-     #GET-request
+
     profile = get_profile_for_user(user_id)
+
     return render_template("profile.html", profile=profile)
+
 
 @app.route("/matches")
 @login_required
 def show_matches_page():
     """
     Visar möjliga matchningar, sökning och filtrering.
-
-    Kravkoppling:
-    - F-MAT-1
-    - F-MAT-1.1
-    - F-MAT-1.2
-    - F-INT-1
     """
     user_id = get_logged_in_user_id()
 
@@ -736,15 +803,7 @@ def show_matches_page():
 @login_required
 def handle_swipe(to_user_id, action):
     """
-    Hanterar swipe/intresse för en annan användare.
-
-    action kan vara:
-    - like
-    - dislike
-
-    Kravkoppling:
-    - F-INT-1: Visa intresse eller ej intresse.
-    - F-INT-1.1: Matchning vid ömsesidigt intresse.
+    Hanterar ja/nej-intresse för en annan användare.
     """
     current_user_id = get_logged_in_user_id()
 
@@ -779,6 +838,63 @@ def handle_swipe(to_user_id, action):
 
     return redirect(url_for("show_matches_page"))
 
+
+@app.route("/my-matches")
+@login_required
+def show_my_matches_page():
+    """
+    Visar alla bekräftade matchningar för den inloggade användaren.
+    """
+    user_id = get_logged_in_user_id()
+    my_matches = get_my_confirmed_matches(user_id)
+
+    return render_template("my_matches.html", my_matches=my_matches)
+
+
+@app.route("/chat/<int:match_id>", methods=["GET", "POST"])
+@login_required
+def show_chat_page(match_id):
+    """
+    Visar och hanterar chatt för en bekräftad matchning.
+    """
+    current_user_id = get_logged_in_user_id()
+
+    match_row = get_match_for_user(match_id, current_user_id)
+
+    if match_row is None:
+        flash("Du har inte tillgång till den här chatten.", "error")
+        return redirect(url_for("show_my_matches_page"))
+
+    if request.method == "POST":
+        message_text = request.form.get("message_text", "").strip()
+
+        if not message_text:
+            flash("Du kan inte skicka ett tomt meddelande.", "error")
+            return redirect(url_for("show_chat_page", match_id=match_id))
+
+        try:
+            save_message(match_id, current_user_id, message_text)
+            return redirect(url_for("show_chat_page", match_id=match_id))
+
+        except Exception:
+            connection = g.pop("db_connection", None)
+            if connection is not None:
+                connection.rollback()
+                connection.close()
+
+            flash("Något gick fel när meddelandet skulle skickas.", "error")
+            return redirect(url_for("show_chat_page", match_id=match_id))
+
+    chat_messages = get_messages_for_match(match_id)
+
+    return render_template(
+        "chat.html",
+        match_row=match_row,
+        messages=chat_messages,
+        current_user_id=current_user_id
+    )
+
+
 @app.route("/logout")
 @login_required
 def logout_user():
@@ -787,8 +903,9 @@ def logout_user():
     """
     session.clear()
     flash("Du är nu utloggad.", "success")
+
     return redirect(url_for("show_home_page"))
 
 
 if __name__ == "__main__":
-    app.run(debug=True, port=5050)
+    app.run(debug=True)

@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="sv">
+<head>
+    <meta charset="UTF-8">
+    <title>Mina matchningar</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <header>
+        <h1>StudyBudy</h1>
+        <nav>
+            <a href="{{ url_for('show_dashboard_page') }}">Dashboard</a>
+            <a href="{{ url_for('show_profile_page') }}">Redigera profil</a>
+            <a href="{{ url_for('show_matches_page') }}">Matchningar</a>
+            <a href="{{ url_for('show_my_matches_page') }}">Mina matchningar</a>
+            <a href="{{ url_for('logout_user') }}">Logga ut</a>
+        </nav>
+    </header>
+
+    <main>
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                {% for category, message in messages %}
+                    <p class="flash-message flash-{{ category }}">{{ message }}</p>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+
+        <section class="matches-grid">
+            {% if my_matches %}
+                {% for match in my_matches %}
+                    <div class="match-card">
+                        {% if match[10] %}
+                            <img class="profile-image" src="{{ url_for('static', filename='uploads/' + match[10]) }}" alt="Profilbild">
+                        {% else %}
+                            <div class="profile-placeholder">
+                                Ingen profilbild
+                            </div>
+                        {% endif %}
+
+                        <h3>{{ match[1] }}</h3>
+
+                        <p><strong>E-post:</strong> {{ match[2] }}</p>
+                        <p><strong>Campus:</strong> {{ match[3] or 'Ej angivet' }}</p>
+                        <p><strong>Ämne:</strong> {{ match[4] or 'Ej angivet' }}</p>
+                        <p><strong>Studietyp:</strong> {{ match[5] or 'Ej angivet' }}</p>
+                        <p><strong>Tillgänglighet:</strong> {{ match[6] or 'Ej angivet' }}</p>
+                        <p><strong>Kompetenser:</strong> {{ match[7] or 'Ej angivet' }}</p>
+                        <p><strong>Behöver hjälp med:</strong> {{ match[8] or 'Ej angivet' }}</p>
+                        <p><strong>Bio:</strong> {{ match[9] or 'Ej angivet' }}</p>
+
+                        <a class="button-link" href="mailto:{{ match[2] }}">
+                            Kontakta via e-post
+                        </a>
+                    </div>
+                {% endfor %}
+            {% else %}
+                <div class="no-matches">
+                    Du har inga bekräftade matchningar ännu.
+                </div>
+            {% endif %}
+        </section>
+    </main>
+</body>
+</html>

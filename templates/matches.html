@@ -26,16 +26,50 @@
         {% endwith %}
 
         <section class="card">
-            <h2>Hitta studiekamrater</h2>
+            <h2>Dina möjliga matchningar</h2>
 
-            <form method="GET" class="filter-form">
-                <label for="campus">Filtrera på campus</label>
-                <input type="text" id="campus" name="campus" value="{{ campus_filter }}">
+            <form method="GET" class="search-filter-form">
+                <div class="search-row">
+                    <input 
+                        type="text" 
+                        id="search" 
+                        name="search" 
+                        placeholder="Sök efter namn, ämne, campus, kompetenser..." 
+                        value="{{ search_query }}"
+                    >
 
-                <label for="subject">Filtrera på ämne</label>
-                <input type="text" id="subject" name="subject" value="{{ subject_filter }}">
+                    <button type="button" class="filter-toggle" onclick="toggleFilterMenu()">
+                        Filtrera
+                    </button>
 
-                <button type="submit">Filtrera</button>
+                    <button type="submit" class="search-button">
+                        Sök
+                    </button>
+                </div>
+
+                <div id="filter-menu" class="filter-dropdown">
+                    <label for="campus">Filtrera på campus</label>
+                    <input 
+                        type="text" 
+                        id="campus" 
+                        name="campus" 
+                        placeholder="Exempel: Malmö" 
+                        value="{{ campus_filter }}"
+                    >
+
+                    <label for="subject">Filtrera på ämne</label>
+                    <input 
+                        type="text" 
+                        id="subject" 
+                        name="subject" 
+                        placeholder="Exempel: Programmering" 
+                        value="{{ subject_filter }}"
+                    >
+
+                    <button type="submit" class="apply-filter-button">
+                        Använd filter
+                    </button>
+                </div>
             </form>
         </section>
 
@@ -45,6 +79,10 @@
                     <div class="match-card">
                         {% if match[9] %}
                             <img class="profile-image" src="{{ url_for('static', filename='uploads/' + match[9]) }}" alt="Profilbild">
+                        {% else %}
+                            <div class="profile-placeholder">
+                                Ingen profilbild
+                            </div>
                         {% endif %}
 
                         <h3>{{ match[1] }}</h3>
@@ -81,5 +119,17 @@
             {% endif %}
         </section>
     </main>
+
+    <script>
+        function toggleFilterMenu() {
+            const filterMenu = document.getElementById("filter-menu");
+
+            if (filterMenu.style.display === "block") {
+                filterMenu.style.display = "none";
+            } else {
+                filterMenu.style.display = "block";
+            }
+        }
+    </script>
 </body>
 </html>

@@ -6,6 +6,10 @@ body {
     color: #2b1b1b;
 }
 
+/* ------------------------------
+   HEADER / NAV
+------------------------------ */
+
 header {
     background-color: #5c0f17;
     color: white;
@@ -14,6 +18,10 @@ header {
 
 header h1 {
     margin: 0 0 10px 0;
+}
+
+nav {
+    margin-bottom: 14px;
 }
 
 nav a {
@@ -27,6 +35,124 @@ nav a:hover {
     text-decoration: underline;
 }
 
+/* ------------------------------
+   TOP SEARCH / FILTER
+------------------------------ */
+
+.top-search-form {
+    max-width: 900px;
+    margin: 0;
+}
+
+.top-search-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.top-search-row input {
+    flex: 1;
+    min-width: 0;
+    height: 42px;
+    margin: 0;
+    padding: 0 14px;
+    border: none;
+    border-radius: 8px;
+    background-color: #fffdfd;
+    color: #2b1b1b;
+    box-sizing: border-box;
+    font-family: Arial, sans-serif;
+    font-size: 14px;
+}
+
+.filter-wrapper {
+    position: relative;
+}
+
+.filter-button,
+.search-button {
+    height: 42px;
+    width: 110px;
+    padding: 0;
+    background-color: #8b1e2d;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: bold;
+    font-size: 14px;
+    font-family: Arial, sans-serif;
+    text-align: center;
+    line-height: 42px;
+    box-sizing: border-box;
+    display: inline-block;
+    white-space: nowrap;
+}
+
+.filter-button:hover,
+.search-button:hover {
+    background-color: #6f1622;
+}
+
+.filter-dropdown {
+    display: none;
+    position: absolute;
+    right: 0;
+    top: 50px;
+    width: 260px;
+    background-color: white;
+    border: 1px solid #ddb7bc;
+    border-radius: 10px;
+    padding: 15px;
+    z-index: 20;
+    box-shadow: 0 6px 18px rgba(0, 0, 0, 0.18);
+}
+
+.filter-dropdown label {
+    display: block;
+    margin-top: 10px;
+    margin-bottom: 5px;
+    color: #5c0f17;
+    font-weight: bold;
+}
+
+.filter-dropdown label:first-child {
+    margin-top: 0;
+}
+
+.filter-dropdown input {
+    width: 100%;
+    height: 38px;
+    padding: 0 10px;
+    margin-bottom: 10px;
+    border: 1px solid #c9b3b3;
+    border-radius: 5px;
+    background-color: #fffdfd;
+    color: #2b1b1b;
+    box-sizing: border-box;
+}
+
+.apply-filter-button {
+    width: 100%;
+    height: 40px;
+    background-color: #8b1e2d;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: bold;
+    font-size: 14px;
+    font-family: Arial, sans-serif;
+}
+
+.apply-filter-button:hover {
+    background-color: #6f1622;
+}
+
+/* ------------------------------
+   MAIN
+------------------------------ */
+
 main {
     padding: 20px;
 }
@@ -39,6 +165,10 @@ main {
     box-shadow: 0 2px 8px rgba(92, 15, 23, 0.08);
     margin-bottom: 20px;
 }
+
+/* ------------------------------
+   GENERAL FORMS
+------------------------------ */
 
 label {
     display: block;
@@ -59,6 +189,7 @@ select {
     border-radius: 5px;
     background-color: #fffdfd;
     color: #2b1b1b;
+    font-family: Arial, sans-serif;
 }
 
 textarea {
@@ -76,6 +207,7 @@ button,
     border-radius: 5px;
     cursor: pointer;
     width: auto;
+    font-family: Arial, sans-serif;
 }
 
 button:hover,
@@ -122,17 +254,39 @@ button:hover,
     box-sizing: border-box;
 }
 
+.profile-placeholder {
+    width: 180px;
+    height: 260px;
+    background-color: #eeeeee;
+    border-radius: 14px;
+    border: 3px solid #dddddd;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    color: #666666;
+    margin: 0 auto 16px auto;
+    text-align: center;
+    box-sizing: border-box;
+}
+
 /* ------------------------------
    MATCHES-SIDAN
 ------------------------------ */
 
+.matches-grid {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
 .match-card {
     background-color: #fffdfd;
     border: 1px solid #ddb7bc;
-    border-radius: 8px;
-    padding: 15px;
+    border-radius: 10px;
+    padding: 18px;
     margin-bottom: 20px;
     box-shadow: 0 2px 8px rgba(92, 15, 23, 0.06);
+    max-width: 700px;
 }
 
 .match-card h3 {
@@ -154,56 +308,18 @@ button:hover,
     margin-top: 8px;
 }
 
-.matches-grid {
-    display: flex;
-    flex-direction: column;
-    gap: 20px;
-}
-
-.filter-form {
-    display: block;
-}
-
-.filter-form button {
-    margin-top: 10px;
-}
-
 .no-matches {
     background-color: #fffdfd;
     border: 1px dashed #c9b3b3;
     border-radius: 8px;
     padding: 15px;
     color: #5c0f17;
+    max-width: 700px;
 }
 
-.swipe-card {
-    width: 100%;
-    max-width: 420px;
-    background-color: white;
-    border: 1px solid #dddddd;
-    border-radius: 16px;
-    padding: 20px;
-    margin-bottom: 24px;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
-}
-
-
-.profile-placeholder {
-    width: 100%;
-    height: 200px;
-    background-color: #eeeeee;
-    border-radius: 14px;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    color: #666666;
-    margin-bottom: 16px;
-}
-
-.score {
-    font-weight: bold;
-    margin-top: 16px;
-}
+/* ------------------------------
+   SWIPE BUTTONS
+------------------------------ */
 
 .swipe-buttons {
     display: flex;
@@ -214,6 +330,7 @@ button:hover,
 
 .swipe-buttons form {
     width: 100%;
+    margin: 0;
 }
 
 .swipe-buttons button {
@@ -243,12 +360,49 @@ button:hover,
     background-color: #1e8449;
 }
 
+/* ------------------------------
+   RESPONSIVE
+------------------------------ */
+
 @media (max-width: 600px) {
-    .filter-form {
-        flex-direction: column;
+    header {
+        padding: 16px;
     }
 
-    .swipe-card {
+    nav {
+        margin-bottom: 12px;
+    }
+
+    nav a {
+        display: inline-block;
+        margin-bottom: 8px;
+    }
+
+    .top-search-row {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .top-search-row input {
+        width: 100%;
+    }
+
+    .filter-button,
+    .search-button {
+        width: 100%;
+    }
+
+    .filter-dropdown {
+        position: static;
+        width: auto;
+        margin-top: 10px;
+    }
+
+    main {
+        padding: 16px;
+    }
+
+    .match-card {
         max-width: 100%;
     }
 
