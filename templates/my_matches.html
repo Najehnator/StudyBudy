@@ -30,27 +30,26 @@
             {% if my_matches %}
                 {% for match in my_matches %}
                     <div class="match-card">
-                        {% if match[10] %}
-                            <img class="profile-image" src="{{ url_for('static', filename='uploads/' + match[10]) }}" alt="Profilbild">
+                        {% if match[11] %}
+                            <img class="profile-image" src="{{ url_for('static', filename='uploads/' + match[11]) }}" alt="Profilbild">
                         {% else %}
                             <div class="profile-placeholder">
                                 Ingen profilbild
                             </div>
                         {% endif %}
 
-                        <h3>{{ match[1] }}</h3>
+                        <h3>{{ match[2] }}</h3>
 
-                        <p><strong>E-post:</strong> {{ match[2] }}</p>
-                        <p><strong>Campus:</strong> {{ match[3] or 'Ej angivet' }}</p>
-                        <p><strong>Ämne:</strong> {{ match[4] or 'Ej angivet' }}</p>
-                        <p><strong>Studietyp:</strong> {{ match[5] or 'Ej angivet' }}</p>
-                        <p><strong>Tillgänglighet:</strong> {{ match[6] or 'Ej angivet' }}</p>
-                        <p><strong>Kompetenser:</strong> {{ match[7] or 'Ej angivet' }}</p>
-                        <p><strong>Behöver hjälp med:</strong> {{ match[8] or 'Ej angivet' }}</p>
-                        <p><strong>Bio:</strong> {{ match[9] or 'Ej angivet' }}</p>
+                        <p><strong>Campus:</strong> {{ match[4] or 'Ej angivet' }}</p>
+                        <p><strong>Ämne:</strong> {{ match[5] or 'Ej angivet' }}</p>
+                        <p><strong>Studietyp:</strong> {{ match[6] or 'Ej angivet' }}</p>
+                        <p><strong>Tillgänglighet:</strong> {{ match[7] or 'Ej angivet' }}</p>
+                        <p><strong>Kompetenser:</strong> {{ match[8] or 'Ej angivet' }}</p>
+                        <p><strong>Behöver hjälp med:</strong> {{ match[9] or 'Ej angivet' }}</p>
+                        <p><strong>Bio:</strong> {{ match[10] or 'Ej angivet' }}</p>
 
-                        <a class="button-link" href="mailto:{{ match[2] }}">
-                            Kontakta via e-post
+                        <a class="button-link" href="{{ url_for('show_chat_page', match_id=match[0]) }}">
+                            Öppna chatt
                         </a>
                     </div>
                 {% endfor %}
