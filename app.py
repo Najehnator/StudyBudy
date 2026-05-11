@@ -876,7 +876,9 @@ def show_chat_page(match_id):
             save_message(match_id, current_user_id, message_text)
             return redirect(url_for("show_chat_page", match_id=match_id))
 
-        except Exception:
+        except Exception as error:
+            print("Fel vid skickande av meddelande:", error)
+
             connection = g.pop("db_connection", None)
             if connection is not None:
                 connection.rollback()
@@ -890,10 +892,9 @@ def show_chat_page(match_id):
     return render_template(
         "chat.html",
         match_row=match_row,
-        messages=chat_messages,
+        chat_messages=chat_messages,
         current_user_id=current_user_id
     )
-
 
 @app.route("/logout")
 @login_required

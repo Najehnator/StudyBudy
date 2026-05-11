@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="sv">
+<head>
+    <meta charset="UTF-8">
+    <title>Chatt</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <header>
+        <h1>StudyBudy</h1>
+        <nav>
+            <a href="{{ url_for('show_dashboard_page') }}">Dashboard</a>
+            <a href="{{ url_for('show_profile_page') }}">Redigera profil</a>
+            <a href="{{ url_for('show_matches_page') }}">Matchningar</a>
+            <a href="{{ url_for('show_my_matches_page') }}">Mina matchningar</a>
+            <a href="{{ url_for('logout_user') }}">Logga ut</a>
+        </nav>
+    </header>
+
+    <main>
+        {% with flash_messages = get_flashed_messages(with_categories=true) %}
+            {% if flash_messages %}
+                {% for category, message in flash_messages %}
+                    <p class="flash-message flash-{{ category }}">{{ message }}</p>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+
+        <section class="chat-container">
+            <div class="chat-header">
+                <h2>Chatt med {{ match_row[3] }}</h2>
+
+                <a class="button-link" href="{{ url_for('show_my_matches_page') }}">
+                    Tillbaka
+                </a>
+            </div>
+
+            <div class="chat-messages">
+                {% if chat_messages %}
+                    {% for message in chat_messages %}
+                        {% if message[1] == current_user_id %}
+                            <div class="chat-message my-message">
+                                <p>{{ message[3] }}</p>
+                                <span>{{ message[4] }}</span>
+                            </div>
+                        {% else %}
+                            <div class="chat-message other-message">
+                                <strong>{{ message[2] }}</strong>
+                                <p>{{ message[3] }}</p>
+                                <span>{{ message[4] }}</span>
+                            </div>
+                        {% endif %}
+                    {% endfor %}
+                {% else %}
+                    <p class="empty-chat">
+                        Inga meddelanden ännu. Skriv första meddelandet.
+                    </p>
+                {% endif %}
+            </div>
+
+            <form method="POST" class="chat-form">
+                <textarea 
+                    name="message_text" 
+                    placeholder="Skriv ett meddelande..." 
+                    required
+                ></textarea>
+
+                <button type="submit">
+                    Skicka
+                </button>
+            </form>
+        </section>
+    </main>
+</body>
+</html>
