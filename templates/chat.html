@@ -41,13 +41,13 @@
                         {% if message[1] == current_user_id %}
                             <div class="chat-message my-message">
                                 <p>{{ message[3] }}</p>
-                                <span>{{ message[4] }}</span>
+                                <span>{{ message[4].strftime('%Y-%m-%d %H:%M') }}</span>
                             </div>
                         {% else %}
                             <div class="chat-message other-message">
                                 <strong>{{ message[2] }}</strong>
                                 <p>{{ message[3] }}</p>
-                                <span>{{ message[4] }}</span>
+                                <span>{{ message[4].strftime('%Y-%m-%d %H:%M') }}</span>
                             </div>
                         {% endif %}
                     {% endfor %}
@@ -59,9 +59,9 @@
             </div>
 
             <form method="POST" class="chat-form">
-                <textarea 
-                    name="message_text" 
-                    placeholder="Skriv ett meddelande..." 
+                <textarea
+                    name="message_text"
+                    placeholder="Skriv ett meddelande..."
                     required
                 ></textarea>
 
