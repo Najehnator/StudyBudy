@@ -71,5 +71,17 @@
             </form>
         </section>
     </main>
+
+    <script>
+        const chatTextarea = document.querySelector(".chat-form textarea");
+        const chatForm = document.querySelector(".chat-form");
+
+        chatTextarea.addEventListener("keydown", function(event) {
+            if (event.key === "Enter" && !event.shiftKey) {
+                event.preventDefault();
+                chatForm.submit();
+            }
+        });
+    </script>
 </body>
 </html>
