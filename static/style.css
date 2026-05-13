@@ -621,3 +621,21 @@ button:hover,
     right: 0;
     top: 60px;
 }
+
+.likes-dropdown {
+    display: none !important;
+    position: absolute;
+    right: 0;
+    top: 60px;
+    width: 320px;
+    background-color: white;
+    border: 1px solid #ddb7bc;
+    border-radius: 12px;
+    box-shadow: 0 8px 22px rgba(0, 0, 0, 0.18);
+    z-index: 50;
+    overflow: hidden;
+}
+
+.likes-dropdown.show {
+    display: block !important;
+}

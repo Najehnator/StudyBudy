@@ -97,15 +97,10 @@
     </main>
 
     <script>
-        function toggleLikesDropdown() {
-            const dropdown = document.getElementById("likes-dropdown");
-
-            if (dropdown.style.display === "block") {
-                dropdown.style.display = "none";
-            } else {
-                dropdown.style.display = "block";
-            }
-        }
+    function toggleLikesDropdown() {
+        const dropdown = document.getElementById("likes-dropdown");
+        dropdown.classList.toggle("show");
+    }
     </script>
 </body>
 </html>

@@ -74,7 +74,6 @@
                 <p><strong>E-post:</strong> {{ profile[1] }}</p>
                 <p><strong>Campus:</strong> {{ profile[3] or 'Ej angivet' }}</p>
                 <p><strong>Ämne:</strong> {{ profile[4] or 'Ej angivet' }}</p>
-                <p><strong>Studietyp:</strong> {{ profile[5] or 'Ej angivet' }}</p>
                 <p><strong>Tillgänglighet:</strong> {{ profile[6] or 'Ej angivet' }}</p>
                 <p><strong>Kompetenser:</strong> {{ profile[7] or 'Ej angivet' }}</p>
                 <p><strong>Behöver hjälp med:</strong> {{ profile[8] or 'Ej angivet' }}</p>
@@ -92,15 +91,10 @@
     </main>
 
     <script>
-        function toggleLikesDropdown() {
-            const dropdown = document.getElementById("likes-dropdown");
-
-            if (dropdown.style.display === "block") {
-                dropdown.style.display = "none";
-            } else {
-                dropdown.style.display = "block";
-            }
-        }
+    function toggleLikesDropdown() {
+        const dropdown = document.getElementById("likes-dropdown");
+        dropdown.classList.toggle("show");
+    }
     </script>
 </body>
 </html>
