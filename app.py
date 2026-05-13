@@ -56,6 +56,7 @@ def close_database_connection(error=None):
     Stänger databasanslutningen när sidförfrågan är klar.
     """
     connection = g.pop("db_connection", None)
+
     if connection is not None:
         connection.close()
 
@@ -110,7 +111,9 @@ def login_required(view_function):
         if not user_is_logged_in():
             flash("Du måste logga in först.", "error")
             return redirect(url_for("show_login_page"))
+
         return view_function(*args, **kwargs)
+
     return wrapped_view
 
 
@@ -353,7 +356,6 @@ def get_possible_matches_for_user(current_user_id, campus_filter="", subject_fil
             ON my_user.id <> other_user.id
         WHERE my_user.id = %s
           AND other_user.id <> %s
-
           AND NOT EXISTS (
               SELECT 1
               FROM interests
@@ -384,7 +386,9 @@ def get_possible_matches_for_user(current_user_id, campus_filter="", subject_fil
                 OR other_user.bio ILIKE %s
             )
         """
+
         search_value = f"%{search_query}%"
+
         query_values.extend([
             search_value,
             search_value,
@@ -401,6 +405,7 @@ def get_possible_matches_for_user(current_user_id, campus_filter="", subject_fil
     """
 
     cursor.execute(sql_query, tuple(query_values))
+
     rows = cursor.fetchall()
     cursor.close()
 
@@ -517,6 +522,56 @@ def get_my_confirmed_matches(current_user_id):
     cursor.close()
 
     return rows
+
+
+def get_users_who_liked_me(current_user_id):
+    """
+    Hämtar personer som har visat intresse för mig,
+    men som jag ännu inte har svarat på.
+    """
+    connection = get_database_connection()
+    cursor = connection.cursor()
+
+    cursor.execute(
+        """
+        SELECT
+            users.id,
+            users.display_name,
+            users.campus,
+            users.subject,
+            users.profile_image
+        FROM interests
+        JOIN users
+            ON interests.from_user_id = users.id
+        WHERE interests.to_user_id = %s
+          AND interests.is_interested = TRUE
+          AND NOT EXISTS (
+              SELECT 1
+              FROM interests AS my_interest
+              WHERE my_interest.from_user_id = %s
+                AND my_interest.to_user_id = users.id
+          )
+        ORDER BY interests.created_at DESC
+        """,
+        (current_user_id, current_user_id)
+    )
+
+    rows = cursor.fetchall()
+    cursor.close()
+
+    return rows
+
+
+@app.context_processor
+def inject_likes_dropdown():
+    """
+    Gör liked_me_users tillgänglig i alla templates.
+    """
+    if user_is_logged_in():
+        liked_me_users = get_users_who_liked_me(get_logged_in_user_id())
+        return {"liked_me_users": liked_me_users}
+
+    return {"liked_me_users": []}
 
 
 # --------------------------------------------------
@@ -649,8 +704,11 @@ def show_register_page():
             flash("Kontot skapades. Du kan nu logga in.", "success")
             return redirect(url_for("show_login_page"))
 
-        except Exception:
+        except Exception as error:
+            print("Fel vid registrering:", error)
+
             connection = g.pop("db_connection", None)
+
             if connection is not None:
                 connection.rollback()
                 connection.close()
@@ -756,8 +814,11 @@ def show_profile_page():
             flash("Profilen uppdaterades.", "success")
             return redirect(url_for("show_dashboard_page"))
 
-        except Exception:
+        except Exception as error:
+            print("Fel vid profiluppdatering:", error)
+
             connection = g.pop("db_connection", None)
+
             if connection is not None:
                 connection.rollback()
                 connection.close()
@@ -769,6 +830,27 @@ def show_profile_page():
     profile = get_profile_for_user(user_id)
 
     return render_template("profile.html", profile=profile)
+
+
+@app.route("/user/<int:user_id>")
+@login_required
+def show_other_user_profile_page(user_id):
+    """
+    Visar en annan användares profil.
+    Används från likes-dropdownen.
+    """
+    current_user_id = get_logged_in_user_id()
+
+    if current_user_id == user_id:
+        return redirect(url_for("show_profile_page"))
+
+    profile = get_profile_for_user(user_id)
+
+    if profile is None:
+        flash("Användaren hittades inte.", "error")
+        return redirect(url_for("show_dashboard_page"))
+
+    return render_template("other_user_profile.html", profile=profile)
 
 
 @app.route("/matches")
@@ -809,11 +891,11 @@ def handle_swipe(to_user_id, action):
 
     if current_user_id == to_user_id:
         flash("Du kan inte swipa på dig själv.", "error")
-        return redirect(url_for("show_matches_page"))
+        return redirect(request.referrer or url_for("show_matches_page"))
 
     if action not in ["like", "dislike"]:
         flash("Ogiltig swipe-handling.", "error")
-        return redirect(url_for("show_matches_page"))
+        return redirect(request.referrer or url_for("show_matches_page"))
 
     is_interested = action == "like"
 
@@ -823,20 +905,25 @@ def handle_swipe(to_user_id, action):
         if is_interested and other_user_is_interested_in_me(to_user_id, current_user_id):
             create_match_if_not_exists(current_user_id, to_user_id)
             flash("Det blev en matchning!", "success")
-        elif is_interested:
+            return redirect(url_for("show_my_matches_page"))
+
+        if is_interested:
             flash("Du visade intresse.", "success")
         else:
             flash("Du valde att inte visa intresse.", "success")
 
-    except Exception:
+    except Exception as error:
+        print("Fel vid swipe:", error)
+
         connection = g.pop("db_connection", None)
+
         if connection is not None:
             connection.rollback()
             connection.close()
 
         flash("Något gick fel när ditt val skulle sparas.", "error")
 
-    return redirect(url_for("show_matches_page"))
+    return redirect(request.referrer or url_for("show_matches_page"))
 
 
 @app.route("/my-matches")
@@ -880,6 +967,7 @@ def show_chat_page(match_id):
             print("Fel vid skickande av meddelande:", error)
 
             connection = g.pop("db_connection", None)
+
             if connection is not None:
                 connection.rollback()
                 connection.close()
@@ -896,6 +984,7 @@ def show_chat_page(match_id):
         current_user_id=current_user_id
     )
 
+
 @app.route("/logout")
 @login_required
 def logout_user():
@@ -909,4 +998,4 @@ def logout_user():
 
 
 if __name__ == "__main__":
-    app.run(debug=True, port= 5050)
+    app.run(debug=True, port=5050)
