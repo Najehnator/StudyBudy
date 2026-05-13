@@ -552,3 +552,72 @@ button:hover,
         width: 100%;
     }
 }
+
+/* FIX: Heart button far right and bigger heart */
+
+.main-nav {
+    display: flex;
+    align-items: center;
+    width: 100%;
+}
+
+.nav-links {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 15px;
+}
+
+.likes-wrapper {
+    margin-left: auto;
+    position: relative;
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+}
+
+.likes-button {
+    width: 52px;
+    height: 52px;
+    padding: 0;
+    border-radius: 50%;
+    background-color: #8b1e2d;
+    color: white;
+    border: 2px solid rgba(255, 255, 255, 0.45);
+    cursor: pointer;
+
+    font-size: 34px;
+    font-weight: bold;
+    line-height: 52px;
+    text-align: center;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.likes-button:hover {
+    background-color: #6f1622;
+}
+
+.likes-count {
+    position: absolute;
+    top: -7px;
+    right: -7px;
+    background-color: #e74c3c;
+    color: white;
+    font-size: 12px;
+    min-width: 20px;
+    height: 20px;
+    padding: 0 5px;
+    border-radius: 999px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-sizing: border-box;
+}
+
+.likes-dropdown {
+    right: 0;
+    top: 60px;
+}
