@@ -13,6 +13,7 @@ button,
 .button-link {
     font-family: "Trebuchet MS", "Segoe UI", Arial, sans-serif;
 }
+
 /* ------------------------------
    HEADER / NAV
 ------------------------------ */
@@ -68,7 +69,6 @@ nav a:hover {
     background-color: #fffdfd;
     color: #2b1b1b;
     box-sizing: border-box;
-    font-family: Arial, sans-serif;
     font-size: 14px;
 }
 
@@ -88,7 +88,6 @@ nav a:hover {
     cursor: pointer;
     font-weight: bold;
     font-size: 14px;
-    font-family: Arial, sans-serif;
     text-align: center;
     line-height: 42px;
     box-sizing: border-box;
@@ -149,7 +148,6 @@ nav a:hover {
     cursor: pointer;
     font-weight: bold;
     font-size: 14px;
-    font-family: Arial, sans-serif;
 }
 
 .apply-filter-button:hover {
@@ -196,7 +194,6 @@ select {
     border-radius: 5px;
     background-color: #fffdfd;
     color: #2b1b1b;
-    font-family: Arial, sans-serif;
 }
 
 textarea {
@@ -214,7 +211,6 @@ button,
     border-radius: 5px;
     cursor: pointer;
     width: auto;
-    font-family: Arial, sans-serif;
 }
 
 button:hover,
@@ -229,9 +225,11 @@ button:hover,
 .flash-message {
     padding: 10px;
     border-radius: 5px;
-    margin-bottom: 10px;
+    margin: 0 auto 10px auto;
     border: 1px solid transparent;
     font-weight: bold;
+    max-width: 700px;
+    box-sizing: border-box;
 }
 
 .flash-success {
@@ -283,7 +281,12 @@ button:hover,
 .matches-grid {
     display: flex;
     flex-direction: column;
+    align-items: center;
     gap: 20px;
+
+    width: 100%;
+    max-width: 760px;
+    margin: 0 auto;
 }
 
 .match-card {
@@ -293,7 +296,10 @@ button:hover,
     padding: 18px;
     margin-bottom: 20px;
     box-shadow: 0 2px 8px rgba(92, 15, 23, 0.06);
+
+    width: 100%;
     max-width: 700px;
+    box-sizing: border-box;
 }
 
 .match-card h3 {
@@ -319,9 +325,14 @@ button:hover,
     background-color: #fffdfd;
     border: 1px dashed #c9b3b3;
     border-radius: 8px;
-    padding: 15px;
+    padding: 18px;
     color: #5c0f17;
+
+    width: 100%;
     max-width: 700px;
+    box-sizing: border-box;
+    text-align: center;
+    margin: 0 auto;
 }
 
 /* ------------------------------
@@ -368,67 +379,18 @@ button:hover,
 }
 
 /* ------------------------------
-   RESPONSIVE
------------------------------- */
-
-@media (max-width: 600px) {
-    header {
-        padding: 16px;
-    }
-
-    nav {
-        margin-bottom: 12px;
-    }
-
-    nav a {
-        display: inline-block;
-        margin-bottom: 8px;
-    }
-
-    .top-search-row {
-        flex-direction: column;
-        align-items: stretch;
-    }
-
-    .top-search-row input {
-        width: 100%;
-    }
-
-    .filter-button,
-    .search-button {
-        width: 100%;
-    }
-
-    .filter-dropdown {
-        position: static;
-        width: auto;
-        margin-top: 10px;
-    }
-
-    main {
-        padding: 16px;
-    }
-
-    .match-card {
-        max-width: 100%;
-    }
-
-    .swipe-buttons {
-        flex-direction: column;
-    }
-}
-
-/* ------------------------------
    CHAT
 ------------------------------ */
 
 .chat-container {
     max-width: 800px;
+    margin: 0 auto;
     background-color: #fffdfd;
     border: 1px solid #ddb7bc;
     border-radius: 12px;
     padding: 20px;
     box-shadow: 0 2px 8px rgba(92, 15, 23, 0.06);
+    box-sizing: border-box;
 }
 
 .chat-header {
@@ -517,7 +479,61 @@ button:hover,
     font-weight: bold;
 }
 
+/* ------------------------------
+   RESPONSIVE
+------------------------------ */
+
 @media (max-width: 600px) {
+    header {
+        padding: 16px;
+    }
+
+    nav {
+        margin-bottom: 12px;
+    }
+
+    nav a {
+        display: inline-block;
+        margin-bottom: 8px;
+    }
+
+    .top-search-row {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .top-search-row input {
+        width: 100%;
+    }
+
+    .filter-button,
+    .search-button {
+        width: 100%;
+    }
+
+    .filter-dropdown {
+        position: static;
+        width: auto;
+        margin-top: 10px;
+    }
+
+    main {
+        padding: 16px;
+    }
+
+    .matches-grid {
+        max-width: 100%;
+    }
+
+    .match-card,
+    .no-matches {
+        max-width: 100%;
+    }
+
+    .swipe-buttons {
+        flex-direction: column;
+    }
+
     .chat-header {
         flex-direction: column;
         align-items: flex-start;
