@@ -47,6 +47,7 @@ def get_database_connection():
     """
     if "db_connection" not in g:
         g.db_connection = open_database_connection()
+
     return g.db_connection
 
 
@@ -297,6 +298,10 @@ def update_user_profile(
 def get_possible_matches_for_user(current_user_id, campus_filter="", subject_filter="", search_query=""):
     """
     Hämtar möjliga studiekamrater för den inloggade användaren.
+
+    Viktigt:
+    Personer visas även om användaren redan har tryckt ja eller nej tidigare.
+    Det gör att användaren kan söka upp en profil igen och ändra sitt val.
     """
     connection = get_database_connection()
     cursor = connection.cursor()
@@ -356,15 +361,9 @@ def get_possible_matches_for_user(current_user_id, campus_filter="", subject_fil
             ON my_user.id <> other_user.id
         WHERE my_user.id = %s
           AND other_user.id <> %s
-          AND NOT EXISTS (
-              SELECT 1
-              FROM interests
-              WHERE interests.from_user_id = %s
-                AND interests.to_user_id = other_user.id
-          )
     """
 
-    query_values = [current_user_id, current_user_id, current_user_id]
+    query_values = [current_user_id, current_user_id]
 
     if campus_filter:
         sql_query += " AND other_user.campus ILIKE %s"
@@ -415,6 +414,8 @@ def get_possible_matches_for_user(current_user_id, campus_filter="", subject_fil
 def save_user_interest(from_user_id, to_user_id, is_interested):
     """
     Sparar om användaren är intresserad eller inte.
+
+    Om användaren redan har gjort ett val tidigare uppdateras valet.
     """
     connection = get_database_connection()
     cursor = connection.cursor()
@@ -528,6 +529,9 @@ def get_users_who_liked_me(current_user_id):
     """
     Hämtar personer som har visat intresse för mig,
     men som jag ännu inte har svarat på.
+
+    Om jag redan har tryckt ja eller nej på personen visas den inte i hjärt-dropdownen.
+    Personen kan fortfarande hittas via sök/matchningar.
     """
     connection = get_database_connection()
     cursor = connection.cursor()
@@ -658,56 +662,6 @@ def save_message(match_id, sender_user_id, message_text):
 
     connection.commit()
     cursor.close()
-
-def get_users_who_liked_me(current_user_id):
-    """
-    Hämtar personer som har visat intresse för mig,
-    men som jag ännu inte har svarat på.
-    """
-    connection = get_database_connection()
-    cursor = connection.cursor()
-
-    cursor.execute(
-        """
-        SELECT
-            users.id,
-            users.display_name,
-            users.campus,
-            users.subject,
-            users.profile_image
-        FROM interests
-        JOIN users
-            ON interests.from_user_id = users.id
-        WHERE interests.to_user_id = %s
-          AND interests.is_interested = TRUE
-          AND NOT EXISTS (
-              SELECT 1
-              FROM interests AS my_interest
-              WHERE my_interest.from_user_id = %s
-                AND my_interest.to_user_id = users.id
-          )
-        ORDER BY interests.created_at DESC
-        """,
-        (current_user_id, current_user_id)
-    )
-
-    rows = cursor.fetchall()
-    cursor.close()
-
-    return rows
-
-
-@app.context_processor
-def inject_likes_dropdown():
-    """
-    Gör likes-dropdown tillgänglig i alla HTML-sidor.
-    """
-    if user_is_logged_in():
-        liked_me_users = get_users_who_liked_me(get_logged_in_user_id())
-        return {"liked_me_users": liked_me_users}
-
-    return {"liked_me_users": []}
-
 
 
 # --------------------------------------------------
