@@ -8,44 +8,99 @@
 <body>
     <header>
         <h1>StudyBudy</h1>
-        <nav>
-            <a href="{{ url_for('show_dashboard_page') }}">Dashboard</a>
-            <a href="{{ url_for('show_profile_page') }}">Redigera profil</a>
-            <a href="{{ url_for('show_matches_page') }}">Matchningar</a>
-            <a href="{{ url_for('show_my_matches_page') }}">Mina matchningar</a>
-            <a href="{{ url_for('logout_user') }}">Logga ut</a>
+
+        <nav class="main-nav">
+            <div class="nav-links">
+                <a href="{{ url_for('show_dashboard_page') }}">Dashboard</a>
+                <a href="{{ url_for('show_profile_page') }}">Redigera profil</a>
+                <a href="{{ url_for('show_matches_page') }}">Matchningar</a>
+                <a href="{{ url_for('show_my_matches_page') }}">Mina matchningar</a>
+                <a href="{{ url_for('logout_user') }}">Logga ut</a>
+            </div>
+
+            <div class="likes-wrapper">
+                <button type="button" class="likes-button" onclick="toggleLikesDropdown()">
+                    ♥
+                    {% if liked_me_users %}
+                        <span class="likes-count">{{ liked_me_users|length }}</span>
+                    {% endif %}
+                </button>
+
+                <div id="likes-dropdown" class="likes-dropdown">
+                    {% if liked_me_users %}
+                        {% for liked_user in liked_me_users %}
+                            <a class="likes-item" href="{{ url_for('show_other_user_profile_page', user_id=liked_user[0]) }}">
+                                {% if liked_user[4] %}
+                                    <img src="{{ url_for('static', filename='uploads/' + liked_user[4]) }}" alt="Profilbild">
+                                {% else %}
+                                    <div class="small-profile-placeholder">?</div>
+                                {% endif %}
+
+                                <div>
+                                    <strong>{{ liked_user[1] }}</strong>
+                                    <span>{{ liked_user[2] or 'Ej campus' }} · {{ liked_user[3] or 'Ej ämne' }}</span>
+                                </div>
+                            </a>
+                        {% endfor %}
+                    {% else %}
+                        <p class="likes-empty">Ingen har visat intresse ännu.</p>
+                    {% endif %}
+                </div>
+            </div>
         </nav>
     </header>
 
     <main>
-        <section class="card">
-            <h2>Dashboard</h2>
+        {% with flash_messages = get_flashed_messages(with_categories=true) %}
+            {% if flash_messages %}
+                {% for category, message in flash_messages %}
+                    <p class="flash-message flash-{{ category }}">{{ message }}</p>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
 
-            {% with messages = get_flashed_messages(with_categories=true) %}
-                {% if messages %}
-                    {% for category, message in messages %}
-                        <p class="flash-message flash-{{ category }}">{{ message }}</p>
-                    {% endfor %}
-                {% endif %}
-            {% endwith %}
+        <section class="matches-grid">
+            <div class="match-card">
+                <h2>Välkommen, {{ profile[2] }}</h2>
 
-            {% if profile %}
                 {% if profile[10] %}
                     <img class="profile-image" src="{{ url_for('static', filename='uploads/' + profile[10]) }}" alt="Profilbild">
+                {% else %}
+                    <div class="profile-placeholder">
+                        Ingen profilbild
+                    </div>
                 {% endif %}
 
-                <p><strong>Namn:</strong> {{ profile[2] or 'Ej angivet' }}</p>
-                <p><strong>E-post:</strong> {{ profile[1] or 'Ej angivet' }}</p>
+                <p><strong>E-post:</strong> {{ profile[1] }}</p>
                 <p><strong>Campus:</strong> {{ profile[3] or 'Ej angivet' }}</p>
-                <p><strong>Program/Kurs</strong> {{ profile[4] or 'Ej angivet' }}</p>
+                <p><strong>Ämne:</strong> {{ profile[4] or 'Ej angivet' }}</p>
+                <p><strong>Studietyp:</strong> {{ profile[5] or 'Ej angivet' }}</p>
                 <p><strong>Tillgänglighet:</strong> {{ profile[6] or 'Ej angivet' }}</p>
                 <p><strong>Kompetenser:</strong> {{ profile[7] or 'Ej angivet' }}</p>
                 <p><strong>Behöver hjälp med:</strong> {{ profile[8] or 'Ej angivet' }}</p>
                 <p><strong>Bio:</strong> {{ profile[9] or 'Ej angivet' }}</p>
 
-                <a class="button-link" href="{{ url_for('show_profile_page') }}">Ändra information</a>
-            {% endif %}
+                <a class="button-link" href="{{ url_for('show_profile_page') }}">
+                    Redigera profil
+                </a>
+
+                <a class="button-link" href="{{ url_for('show_matches_page') }}">
+                    Hitta matchningar
+                </a>
+            </div>
         </section>
     </main>
+
+    <script>
+        function toggleLikesDropdown() {
+            const dropdown = document.getElementById("likes-dropdown");
+
+            if (dropdown.style.display === "block") {
+                dropdown.style.display = "none";
+            } else {
+                dropdown.style.display = "block";
+            }
+        }
+    </script>
 </body>
 </html>
