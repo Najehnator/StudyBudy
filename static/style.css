@@ -73,16 +73,13 @@ nav a:hover {
     color: white;
     border: 2px solid rgba(255, 255, 255, 0.45);
     cursor: pointer;
-
     font-size: 34px;
     font-weight: bold;
     line-height: 52px;
     text-align: center;
-
     display: flex;
     align-items: center;
     justify-content: center;
-
     position: relative;
 }
 
@@ -101,14 +98,12 @@ nav a:hover {
     height: 20px;
     padding: 0 5px;
     border-radius: 999px;
-
     display: flex;
     align-items: center;
     justify-content: center;
     box-sizing: border-box;
 }
 
-/* Dropdown är gömd från början */
 .likes-dropdown {
     display: none !important;
     position: absolute;
@@ -123,7 +118,6 @@ nav a:hover {
     overflow: hidden;
 }
 
-/* Den visas bara när JS lägger till klassen show */
 .likes-dropdown.show {
     display: block !important;
 }
@@ -169,11 +163,9 @@ nav a:hover {
     border-radius: 50%;
     background-color: #eeeeee;
     color: #5c0f17;
-
     display: flex;
     justify-content: center;
     align-items: center;
-
     font-weight: bold;
     flex-shrink: 0;
 }
@@ -324,6 +316,43 @@ main {
 }
 
 /* ------------------------------
+   CARD / LOGIN / REGISTER
+------------------------------ */
+
+.card {
+    background-color: white;
+    padding: 20px;
+    border-radius: 8px;
+    max-width: 700px;
+    width: 100%;
+    box-sizing: border-box;
+    box-shadow: 0 2px 8px rgba(92, 15, 23, 0.08);
+    margin: 0 auto 20px auto;
+}
+
+main > form,
+.auth-form {
+    background-color: white;
+    padding: 20px;
+    border-radius: 8px;
+    max-width: 420px;
+    width: 100%;
+    box-sizing: border-box;
+    box-shadow: 0 2px 8px rgba(92, 15, 23, 0.08);
+    margin: 0 auto 20px auto;
+}
+
+/* Om login/register använder section.card ska de vara smalare */
+main > .card:first-child {
+    max-width: 700px;
+}
+
+.login-card,
+.register-card {
+    max-width: 420px;
+}
+
+/* ------------------------------
    GENERAL FORMS
 ------------------------------ */
 
@@ -435,7 +464,6 @@ button:hover,
     flex-direction: column;
     align-items: center;
     gap: 20px;
-
     width: 100%;
     max-width: 760px;
     margin: 0 auto;
@@ -448,7 +476,6 @@ button:hover,
     padding: 18px;
     margin-bottom: 20px;
     box-shadow: 0 2px 8px rgba(92, 15, 23, 0.06);
-
     width: 100%;
     max-width: 700px;
     box-sizing: border-box;
@@ -480,7 +507,6 @@ button:hover,
     border-radius: 8px;
     padding: 18px;
     color: #5c0f17;
-
     width: 100%;
     max-width: 700px;
     box-sizing: border-box;
@@ -685,12 +711,15 @@ button:hover,
         padding: 16px;
     }
 
-    .matches-grid {
+    .card,
+    main > form,
+    .auth-form,
+    .match-card,
+    .no-matches {
         max-width: 100%;
     }
 
-    .match-card,
-    .no-matches {
+    .matches-grid {
         max-width: 100%;
     }
 
