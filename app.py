@@ -604,6 +604,56 @@ def save_message(match_id, sender_user_id, message_text):
     connection.commit()
     cursor.close()
 
+def get_users_who_liked_me(current_user_id):
+    """
+    Hämtar personer som har visat intresse för mig,
+    men som jag ännu inte har svarat på.
+    """
+    connection = get_database_connection()
+    cursor = connection.cursor()
+
+    cursor.execute(
+        """
+        SELECT
+            users.id,
+            users.display_name,
+            users.campus,
+            users.subject,
+            users.profile_image
+        FROM interests
+        JOIN users
+            ON interests.from_user_id = users.id
+        WHERE interests.to_user_id = %s
+          AND interests.is_interested = TRUE
+          AND NOT EXISTS (
+              SELECT 1
+              FROM interests AS my_interest
+              WHERE my_interest.from_user_id = %s
+                AND my_interest.to_user_id = users.id
+          )
+        ORDER BY interests.created_at DESC
+        """,
+        (current_user_id, current_user_id)
+    )
+
+    rows = cursor.fetchall()
+    cursor.close()
+
+    return rows
+
+
+@app.context_processor
+def inject_likes_dropdown():
+    """
+    Gör likes-dropdown tillgänglig i alla HTML-sidor.
+    """
+    if user_is_logged_in():
+        liked_me_users = get_users_who_liked_me(get_logged_in_user_id())
+        return {"liked_me_users": liked_me_users}
+
+    return {"liked_me_users": []}
+
+
 
 # --------------------------------------------------
 # ROUTES
