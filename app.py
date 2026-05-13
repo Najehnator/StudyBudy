@@ -299,9 +299,9 @@ def get_possible_matches_for_user(current_user_id, campus_filter="", subject_fil
     """
     Hämtar möjliga studiekamrater för den inloggade användaren.
 
-    Viktigt:
-    Personer visas även om användaren redan har tryckt ja eller nej tidigare.
-    Det gör att användaren kan söka upp en profil igen och ändra sitt val.
+    Regel:
+    - I vanliga flödet visas inte personer som användaren redan har valt Ja/Nej på.
+    - Om användaren söker manuellt ska även tidigare valda personer kunna dyka upp igen.
     """
     connection = get_database_connection()
     cursor = connection.cursor()
@@ -364,6 +364,19 @@ def get_possible_matches_for_user(current_user_id, campus_filter="", subject_fil
     """
 
     query_values = [current_user_id, current_user_id]
+
+    # Om användaren INTE söker manuellt:
+    # dölj personer som användaren redan har valt Ja/Nej på.
+    if not search_query:
+        sql_query += """
+          AND NOT EXISTS (
+              SELECT 1
+              FROM interests
+              WHERE interests.from_user_id = %s
+                AND interests.to_user_id = other_user.id
+          )
+        """
+        query_values.append(current_user_id)
 
     if campus_filter:
         sql_query += " AND other_user.campus ILIKE %s"
