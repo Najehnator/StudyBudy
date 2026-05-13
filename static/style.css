@@ -28,19 +28,180 @@ header h1 {
     margin: 0 0 10px 0;
 }
 
-nav {
-    margin-bottom: 14px;
-}
-
 nav a {
     color: white;
     text-decoration: none;
-    margin-right: 15px;
     font-weight: bold;
 }
 
 nav a:hover {
     text-decoration: underline;
+}
+
+/* ------------------------------
+   MAIN NAV + HEART BUTTON
+------------------------------ */
+
+.main-nav {
+    display: flex;
+    align-items: center;
+    width: 100%;
+    gap: 16px;
+    margin-bottom: 14px;
+}
+
+.nav-links {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 15px;
+}
+
+.likes-wrapper {
+    margin-left: auto;
+    position: relative;
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+}
+
+.likes-button {
+    width: 52px;
+    height: 52px;
+    padding: 0;
+    border-radius: 50%;
+    background-color: #8b1e2d;
+    color: white;
+    border: 2px solid rgba(255, 255, 255, 0.45);
+    cursor: pointer;
+
+    font-size: 34px;
+    font-weight: bold;
+    line-height: 52px;
+    text-align: center;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    position: relative;
+}
+
+.likes-button:hover {
+    background-color: #6f1622;
+}
+
+.likes-count {
+    position: absolute;
+    top: -7px;
+    right: -7px;
+    background-color: #e74c3c;
+    color: white;
+    font-size: 12px;
+    min-width: 20px;
+    height: 20px;
+    padding: 0 5px;
+    border-radius: 999px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-sizing: border-box;
+}
+
+/* Dropdown är gömd från början */
+.likes-dropdown {
+    display: none !important;
+    position: absolute;
+    right: 0;
+    top: 60px;
+    width: 320px;
+    background-color: white;
+    border: 1px solid #ddb7bc;
+    border-radius: 12px;
+    box-shadow: 0 8px 22px rgba(0, 0, 0, 0.18);
+    z-index: 100;
+    overflow: hidden;
+}
+
+/* Den visas bara när JS lägger till klassen show */
+.likes-dropdown.show {
+    display: block !important;
+}
+
+.likes-item {
+    display: flex !important;
+    align-items: center !important;
+    gap: 10px !important;
+    padding: 12px !important;
+    color: #2b1b1b !important;
+    text-decoration: none !important;
+    border-bottom: 1px solid #f0dddd;
+    background-color: white;
+}
+
+.likes-item:hover {
+    background-color: #f8f4f4;
+    text-decoration: none;
+}
+
+.likes-item img {
+    width: 42px !important;
+    height: 42px !important;
+    min-width: 42px !important;
+    max-width: 42px !important;
+    min-height: 42px !important;
+    max-height: 42px !important;
+    border-radius: 50% !important;
+    object-fit: cover !important;
+    border: none !important;
+    margin: 0 !important;
+    display: block !important;
+    flex-shrink: 0 !important;
+}
+
+.small-profile-placeholder {
+    width: 42px !important;
+    height: 42px !important;
+    min-width: 42px !important;
+    max-width: 42px !important;
+    min-height: 42px !important;
+    max-height: 42px !important;
+    border-radius: 50%;
+    background-color: #eeeeee;
+    color: #5c0f17;
+
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    font-weight: bold;
+    flex-shrink: 0;
+}
+
+.likes-item div {
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+}
+
+.likes-item strong {
+    display: block;
+    color: #5c0f17;
+    font-size: 14px;
+    margin-bottom: 3px;
+}
+
+.likes-item span {
+    display: block;
+    font-size: 13px;
+    color: #6b5555;
+}
+
+.likes-empty {
+    margin: 0;
+    padding: 15px;
+    color: #5c0f17;
+    text-align: center;
 }
 
 /* ------------------------------
@@ -160,15 +321,6 @@ nav a:hover {
 
 main {
     padding: 20px;
-}
-
-.card {
-    background-color: white;
-    padding: 20px;
-    border-radius: 8px;
-    max-width: 700px;
-    box-shadow: 0 2px 8px rgba(92, 15, 23, 0.08);
-    margin-bottom: 20px;
 }
 
 /* ------------------------------
@@ -302,6 +454,7 @@ button:hover,
     box-sizing: border-box;
 }
 
+.match-card h2,
 .match-card h3 {
     margin-top: 0;
     color: #5c0f17;
@@ -488,13 +641,24 @@ button:hover,
         padding: 16px;
     }
 
-    nav {
-        margin-bottom: 12px;
+    .main-nav {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 12px;
     }
 
-    nav a {
-        display: inline-block;
-        margin-bottom: 8px;
+    .nav-links {
+        gap: 10px;
+    }
+
+    .likes-wrapper {
+        margin-left: 0;
+        align-self: flex-end;
+    }
+
+    .likes-dropdown {
+        right: 0;
+        width: 280px;
     }
 
     .top-search-row {
@@ -551,91 +715,4 @@ button:hover,
     .chat-form button {
         width: 100%;
     }
-}
-
-/* FIX: Heart button far right and bigger heart */
-
-.main-nav {
-    display: flex;
-    align-items: center;
-    width: 100%;
-}
-
-.nav-links {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 15px;
-}
-
-.likes-wrapper {
-    margin-left: auto;
-    position: relative;
-    display: flex;
-    justify-content: flex-end;
-    align-items: center;
-}
-
-.likes-button {
-    width: 52px;
-    height: 52px;
-    padding: 0;
-    border-radius: 50%;
-    background-color: #8b1e2d;
-    color: white;
-    border: 2px solid rgba(255, 255, 255, 0.45);
-    cursor: pointer;
-
-    font-size: 34px;
-    font-weight: bold;
-    line-height: 52px;
-    text-align: center;
-
-    display: flex;
-    align-items: center;
-    justify-content: center;
-}
-
-.likes-button:hover {
-    background-color: #6f1622;
-}
-
-.likes-count {
-    position: absolute;
-    top: -7px;
-    right: -7px;
-    background-color: #e74c3c;
-    color: white;
-    font-size: 12px;
-    min-width: 20px;
-    height: 20px;
-    padding: 0 5px;
-    border-radius: 999px;
-
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    box-sizing: border-box;
-}
-
-.likes-dropdown {
-    right: 0;
-    top: 60px;
-}
-
-.likes-dropdown {
-    display: none !important;
-    position: absolute;
-    right: 0;
-    top: 60px;
-    width: 320px;
-    background-color: white;
-    border: 1px solid #ddb7bc;
-    border-radius: 12px;
-    box-shadow: 0 8px 22px rgba(0, 0, 0, 0.18);
-    z-index: 50;
-    overflow: hidden;
-}
-
-.likes-dropdown.show {
-    display: block !important;
 }
