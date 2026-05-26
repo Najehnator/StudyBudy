@@ -31,7 +31,7 @@
                         {% for liked_user in liked_me_users %}
                             <a class="likes-item" href="{{ url_for('show_other_user_profile_page', user_id=liked_user[0]) }}">
                                 {% if liked_user[4] %}
-                                    <img src="{{ url_for('static', filename='uploads/' + liked_user[4]) }}" alt="Profilbild">
+                                    <img src="{{ url_for('show_profile_image', user_id=liked_user[0]) }}" alt="Profilbild">
                                 {% else %}
                                     <div class="small-profile-placeholder">?</div>
                                 {% endif %}
@@ -64,7 +64,7 @@
                 <h2>Välkommen, {{ profile[2] }}</h2>
 
                 {% if profile[10] %}
-                    <img class="profile-image" src="{{ url_for('static', filename='uploads/' + profile[10]) }}" alt="Profilbild">
+                    <img class="profile-image" src="{{ url_for('show_profile_image', user_id=profile[0]) }}" alt="Profilbild">
                 {% else %}
                     <div class="profile-placeholder">
                         Ingen profilbild
@@ -74,6 +74,7 @@
                 <p><strong>E-post:</strong> {{ profile[1] }}</p>
                 <p><strong>Campus:</strong> {{ profile[3] or 'Ej angivet' }}</p>
                 <p><strong>Ämne:</strong> {{ profile[4] or 'Ej angivet' }}</p>
+                <p><strong>Studietyp:</strong> {{ profile[5] or 'Ej angivet' }}</p>
                 <p><strong>Tillgänglighet:</strong> {{ profile[6] or 'Ej angivet' }}</p>
                 <p><strong>Kompetenser:</strong> {{ profile[7] or 'Ej angivet' }}</p>
                 <p><strong>Behöver hjälp med:</strong> {{ profile[8] or 'Ej angivet' }}</p>
@@ -91,10 +92,10 @@
     </main>
 
     <script>
-    function toggleLikesDropdown() {
-        const dropdown = document.getElementById("likes-dropdown");
-        dropdown.classList.toggle("show");
-    }
+        function toggleLikesDropdown() {
+            const dropdown = document.getElementById("likes-dropdown");
+            dropdown.classList.toggle("show");
+        }
     </script>
 </body>
 </html>
