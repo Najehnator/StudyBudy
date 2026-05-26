@@ -31,7 +31,7 @@
                         {% for liked_user in liked_me_users %}
                             <a class="likes-item" href="{{ url_for('show_other_user_profile_page', user_id=liked_user[0]) }}">
                                 {% if liked_user[4] %}
-                                    <img src="{{ url_for('static', filename='uploads/' + liked_user[4]) }}" alt="Profilbild">
+                                    <img src="{{ url_for('show_profile_image', user_id=liked_user[0]) }}" alt="Profilbild">
                                 {% else %}
                                     <div class="small-profile-placeholder">?</div>
                                 {% endif %}
@@ -59,42 +59,70 @@
             {% endif %}
         {% endwith %}
 
-        <section class="matches-grid">
-            <form method="POST" enctype="multipart/form-data" class="match-card">
-                <h2>Redigera profil</h2>
+        <section class="form-section">
+            <h2>Redigera profil</h2>
 
-                {% if profile[10] %}
-                    <img class="profile-image" src="{{ url_for('static', filename='uploads/' + profile[10]) }}" alt="Profilbild">
-                {% else %}
-                    <div class="profile-placeholder">
-                        Ingen profilbild
-                    </div>
-                {% endif %}
+            {% if profile and profile[10] %}
+                <img class="profile-image" src="{{ url_for('show_profile_image', user_id=profile[0]) }}" alt="Profilbild">
+            {% else %}
+                <div class="profile-placeholder">
+                    Ingen profilbild
+                </div>
+            {% endif %}
 
+            <form method="POST" enctype="multipart/form-data">
                 <label for="display_name">Namn</label>
-                <input type="text" id="display_name" name="display_name" value="{{ profile[2] or '' }}" required>
+                <input
+                    type="text"
+                    id="display_name"
+                    name="display_name"
+                    value="{{ profile[2] if profile else '' }}"
+                    required
+                >
 
                 <label for="campus">Campus</label>
-                <input type="text" id="campus" name="campus" value="{{ profile[3] or '' }}">
+                <input
+                    type="text"
+                    id="campus"
+                    name="campus"
+                    value="{{ profile[3] if profile and profile[3] else '' }}"
+                >
 
                 <label for="subject">Ämne</label>
-                <input type="text" id="subject" name="subject" value="{{ profile[4] or '' }}">
+                <input
+                    type="text"
+                    id="subject"
+                    name="subject"
+                    value="{{ profile[4] if profile and profile[4] else '' }}"
+                >
 
+                <label for="study_type">Studietyp</label>
+                <input
+                    type="text"
+                    id="study_type"
+                    name="study_type"
+                    value="{{ profile[5] if profile and profile[5] else '' }}"
+                >
 
                 <label for="availability">Tillgänglighet</label>
-                <textarea id="availability" name="availability">{{ profile[6] or '' }}</textarea>
+                <textarea id="availability" name="availability">{{ profile[6] if profile and profile[6] else '' }}</textarea>
 
                 <label for="competencies">Kompetenser</label>
-                <textarea id="competencies" name="competencies">{{ profile[7] or '' }}</textarea>
+                <textarea id="competencies" name="competencies">{{ profile[7] if profile and profile[7] else '' }}</textarea>
 
                 <label for="needs">Behöver hjälp med</label>
-                <textarea id="needs" name="needs">{{ profile[8] or '' }}</textarea>
+                <textarea id="needs" name="needs">{{ profile[8] if profile and profile[8] else '' }}</textarea>
 
                 <label for="bio">Bio</label>
-                <textarea id="bio" name="bio">{{ profile[9] or '' }}</textarea>
+                <textarea id="bio" name="bio">{{ profile[9] if profile and profile[9] else '' }}</textarea>
 
                 <label for="profile_image">Profilbild</label>
-                <input type="file" id="profile_image" name="profile_image" accept=".jpg,.jpeg,.png">
+                <input
+                    type="file"
+                    id="profile_image"
+                    name="profile_image"
+                    accept=".jpg,.jpeg,.png"
+                >
 
                 <button type="submit">
                     Spara profil
@@ -104,10 +132,15 @@
     </main>
 
     <script>
-    function toggleLikesDropdown() {
-        const dropdown = document.getElementById("likes-dropdown");
-        dropdown.classList.toggle("show");
-    }
+        function toggleLikesDropdown() {
+            const dropdown = document.getElementById("likes-dropdown");
+
+            if (dropdown.style.display === "block") {
+                dropdown.style.display = "none";
+            } else {
+                dropdown.style.display = "block";
+            }
+        }
     </script>
 </body>
 </html>

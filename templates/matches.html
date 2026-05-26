@@ -31,7 +31,7 @@
                         {% for liked_user in liked_me_users %}
                             <a class="likes-item" href="{{ url_for('show_other_user_profile_page', user_id=liked_user[0]) }}">
                                 {% if liked_user[4] %}
-                                    <img src="{{ url_for('static', filename='uploads/' + liked_user[4]) }}" alt="Profilbild">
+                                    <img src="{{ url_for('show_profile_image', user_id=liked_user[0]) }}" alt="Profilbild">
                                 {% else %}
                                     <div class="small-profile-placeholder">?</div>
                                 {% endif %}
@@ -110,7 +110,7 @@
                 {% for match in matches %}
                     <div class="match-card">
                         {% if match[9] %}
-                            <img class="profile-image" src="{{ url_for('static', filename='uploads/' + match[9]) }}" alt="Profilbild">
+                            <img class="profile-image" src="{{ url_for('show_profile_image', user_id=match[0]) }}" alt="Profilbild">
                         {% else %}
                             <div class="profile-placeholder">
                                 Ingen profilbild
