@@ -4,9 +4,8 @@ from functools import wraps
 
 import psycopg2
 from dotenv import load_dotenv
-from flask import Flask, flash, g, redirect, render_template, request, session, url_for
+from flask import Flask, Response, flash, g, redirect, render_template, request, session, url_for
 from werkzeug.security import check_password_hash, generate_password_hash
-from werkzeug.utils import secure_filename
 
 load_dotenv()
 
@@ -18,10 +17,6 @@ db_port = os.environ.get("DB_PORT") or os.environ.get("port")
 
 app = Flask(__name__)
 app.secret_key = "simple-secret-key"
-
-UPLOAD_FOLDER = "static/uploads"
-app.config["UPLOAD_FOLDER"] = UPLOAD_FOLDER
-os.makedirs(UPLOAD_FOLDER, exist_ok=True)
 
 
 # --------------------------------------------------
@@ -181,7 +176,8 @@ def get_profile_for_user(user_id):
     cursor.execute(
         """
         SELECT id, email, display_name, campus, subject, study_type,
-               availability, competencies, needs, bio, profile_image
+               availability, competencies, needs, bio,
+               profile_image IS NOT NULL AS has_profile_image
         FROM users
         WHERE id = %s
         """,
@@ -222,15 +218,21 @@ def update_user_profile(
     competencies,
     needs,
     bio,
-    profile_image
+    image_file=None
 ):
     """
     Uppdaterar användarens profil.
+
+    Om en ny profilbild laddas upp sparas bilden direkt i databasen som BYTEA.
+    Då sparas ingen bild i static/uploads och inget laddas upp till GitHub.
     """
     connection = get_database_connection()
     cursor = connection.cursor()
 
-    if profile_image:
+    if image_file and image_file.filename:
+        image_bytes = image_file.read()
+        image_mimetype = image_file.mimetype
+
         cursor.execute(
             """
             UPDATE users
@@ -243,6 +245,7 @@ def update_user_profile(
                 needs = %s,
                 bio = %s,
                 profile_image = %s,
+                profile_image_mimetype = %s,
                 updated_at = CURRENT_TIMESTAMP
             WHERE id = %s
             """,
@@ -255,7 +258,8 @@ def update_user_profile(
                 competencies,
                 needs,
                 bio,
-                profile_image,
+                psycopg2.Binary(image_bytes),
+                image_mimetype,
                 user_id
             )
         )
@@ -317,7 +321,7 @@ def get_possible_matches_for_user(current_user_id, campus_filter="", subject_fil
             other_user.competencies,
             other_user.needs,
             other_user.bio,
-            other_user.profile_image,
+            other_user.profile_image IS NOT NULL AS has_profile_image,
             (
                 CASE
                     WHEN my_user.subject IS NOT NULL
@@ -365,8 +369,6 @@ def get_possible_matches_for_user(current_user_id, campus_filter="", subject_fil
 
     query_values = [current_user_id, current_user_id]
 
-    # Om användaren INTE söker manuellt:
-    # dölj personer som användaren redan har valt Ja/Nej på.
     if not search_query:
         sql_query += """
           AND NOT EXISTS (
@@ -518,7 +520,7 @@ def get_my_confirmed_matches(current_user_id):
             other_user.competencies,
             other_user.needs,
             other_user.bio,
-            other_user.profile_image,
+            other_user.profile_image IS NOT NULL AS has_profile_image,
             matches.created_at
         FROM matches
         JOIN users AS other_user
@@ -556,7 +558,7 @@ def get_users_who_liked_me(current_user_id):
             users.display_name,
             users.campus,
             users.subject,
-            users.profile_image
+            users.profile_image IS NOT NULL AS has_profile_image
         FROM interests
         JOIN users
             ON interests.from_user_id = users.id
@@ -801,18 +803,12 @@ def show_profile_page():
             return render_template("profile.html", profile=profile)
 
         image_file = request.files.get("profile_image")
-        image_filename = None
 
         if image_file and image_file.filename:
             if not allowed_file(image_file.filename):
                 flash("Du får bara ladda upp JPG- eller PNG-bilder.", "error")
                 profile = get_profile_for_user(user_id)
                 return render_template("profile.html", profile=profile)
-
-            safe_filename = secure_filename(image_file.filename)
-            image_filename = str(user_id) + "_" + safe_filename
-            image_path = os.path.join(app.config["UPLOAD_FOLDER"], image_filename)
-            image_file.save(image_path)
 
         try:
             update_user_profile(
@@ -825,7 +821,7 @@ def show_profile_page():
                 competencies,
                 needs,
                 bio,
-                image_filename
+                image_file
             )
 
             flash("Profilen uppdaterades.", "success")
@@ -847,6 +843,38 @@ def show_profile_page():
     profile = get_profile_for_user(user_id)
 
     return render_template("profile.html", profile=profile)
+
+
+@app.route("/profile-image/<int:user_id>")
+@login_required
+def show_profile_image(user_id):
+    """
+    Hämtar profilbilden från databasen och skickar den till webbläsaren.
+
+    Bilden sparas alltså inte i static/uploads.
+    """
+    connection = get_database_connection()
+    cursor = connection.cursor()
+
+    cursor.execute(
+        """
+        SELECT profile_image, profile_image_mimetype
+        FROM users
+        WHERE id = %s
+        """,
+        (user_id,)
+    )
+
+    image_row = cursor.fetchone()
+    cursor.close()
+
+    if image_row is None or image_row[0] is None:
+        return redirect(url_for("static", filename="default-profile.png"))
+
+    image_bytes = bytes(image_row[0])
+    image_mimetype = image_row[1] or "image/jpeg"
+
+    return Response(image_bytes, mimetype=image_mimetype)
 
 
 @app.route("/user/<int:user_id>")

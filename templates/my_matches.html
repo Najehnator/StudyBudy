@@ -64,8 +64,7 @@
                 {% for match in my_matches %}
                     <div class="match-card">
                         {% if match[11] %}
-                            <img class="profile-image" src="{{ url_for('static', filename='uploads/' + match[11]) }}" alt="Profilbild">
-                        {% else %}
+                            <img src="{{ url_for('show_profile_image', user_id=profile[0]) }}" alt="Profilbild">
                             <div class="profile-placeholder">
                                 Ingen profilbild
                             </div>
