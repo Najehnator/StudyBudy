@@ -31,7 +31,7 @@
                         {% for liked_user in liked_me_users %}
                             <a class="likes-item" href="{{ url_for('show_other_user_profile_page', user_id=liked_user[0]) }}">
                                 {% if liked_user[4] %}
-                                    <img src="{{ url_for('static', filename='uploads/' + liked_user[4]) }}" alt="Profilbild">
+                                    <img src="{{ url_for('show_profile_image', user_id=liked_user[0]) }}" alt="Profilbild">
                                 {% else %}
                                     <div class="small-profile-placeholder">?</div>
                                 {% endif %}
@@ -64,7 +64,8 @@
                 {% for match in my_matches %}
                     <div class="match-card">
                         {% if match[11] %}
-                            <img src="{{ url_for('show_profile_image', user_id=profile[0]) }}" alt="Profilbild">
+                            <img class="profile-image" src="{{ url_for('show_profile_image', user_id=match[1]) }}" alt="Profilbild">
+                        {% else %}
                             <div class="profile-placeholder">
                                 Ingen profilbild
                             </div>
@@ -72,8 +73,10 @@
 
                         <h3>{{ match[2] }}</h3>
 
+                        <p><strong>E-post:</strong> {{ match[3] }}</p>
                         <p><strong>Campus:</strong> {{ match[4] or 'Ej angivet' }}</p>
                         <p><strong>Ämne:</strong> {{ match[5] or 'Ej angivet' }}</p>
+                        <p><strong>Studietyp:</strong> {{ match[6] or 'Ej angivet' }}</p>
                         <p><strong>Tillgänglighet:</strong> {{ match[7] or 'Ej angivet' }}</p>
                         <p><strong>Kompetenser:</strong> {{ match[8] or 'Ej angivet' }}</p>
                         <p><strong>Behöver hjälp med:</strong> {{ match[9] or 'Ej angivet' }}</p>
@@ -93,10 +96,15 @@
     </main>
 
     <script>
-    function toggleLikesDropdown() {
-        const dropdown = document.getElementById("likes-dropdown");
-        dropdown.classList.toggle("show");
-    }
-    </script>   
+        function toggleLikesDropdown() {
+            const dropdown = document.getElementById("likes-dropdown");
+
+            if (dropdown.style.display === "block") {
+                dropdown.style.display = "none";
+            } else {
+                dropdown.style.display = "block";
+            }
+        }
+    </script>
 </body>
 </html>
