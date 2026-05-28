@@ -74,7 +74,7 @@
                             value="{{ subject_filter }}"
                         >
 
-                        <label for="campus">Campus</label>
+                        <label for="campus">Universitet/Högskola</label>
                         <input
                             type="text"
                             id="campus"
@@ -119,8 +119,8 @@
 
                         <h3>{{ match[1] }}</h3>
 
-                        <p><strong>Campus:</strong> {{ match[2] or 'Ej angivet' }}</p>
-                        <p><strong>Ämne:</strong> {{ match[3] or 'Ej angivet' }}</p>
+                        <p><strong>Universitet/Högskola:</strong> {{ match[2] or 'Ej angivet' }}</p>
+                        <p><strong>Kurs/Program:</strong> {{ match[3] or 'Ej angivet' }}</p>
                         <p><strong>Studietyp:</strong> {{ match[4] or 'Ej angivet' }}</p>
                         <p><strong>Tillgänglighet:</strong> {{ match[5] or 'Ej angivet' }}</p>
                         <p><strong>Kompetenser:</strong> {{ match[6] or 'Ej angivet' }}</p>
