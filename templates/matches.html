@@ -38,7 +38,7 @@
 
                                 <div>
                                     <strong>{{ liked_user[1] }}</strong>
-                                    <span>{{ liked_user[2] or 'Ej campus' }} · {{ liked_user[3] or 'Ej ämne' }}</span>
+                                    <span>{{ liked_user[2] or 'Ej universitet/högskola' }} · {{ liked_user[3] or 'Ej kurs/program' }}</span>
                                 </div>
                             </a>
                         {% endfor %}
@@ -55,7 +55,7 @@
                     type="text"
                     id="search"
                     name="search"
-                    placeholder="Sök efter namn, ämne, campus eller kompetenser..."
+                    placeholder="Sök efter namn, kurs/program, universitet/högskola eller kompetenser..."
                     value="{{ search_query }}"
                 >
 
