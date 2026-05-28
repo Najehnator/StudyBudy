@@ -2,6 +2,7 @@
 <html lang="sv">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Dashboard</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 </head>
@@ -19,7 +20,7 @@
             </div>
 
             <div class="likes-wrapper">
-                <button type="button" class="likes-button" onclick="toggleLikesDropdown()">
+                <button type="button" class="likes-button" onclick="toggleLikesDropdown()" aria-label="Visa personer som visat intresse">
                     ♥
                     {% if liked_me_users %}
                         <span class="likes-count">{{ liked_me_users|length }}</span>

@@ -2,6 +2,7 @@
 <html lang="sv">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Profil</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 </head>
@@ -19,7 +20,7 @@
             </div>
 
             <div class="likes-wrapper">
-                <button type="button" class="likes-button" onclick="toggleLikesDropdown()">
+                <button type="button" class="likes-button" onclick="toggleLikesDropdown()" aria-label="Visa personer som visat intresse">
                     ♥
                     {% if liked_me_users %}
                         <span class="likes-count">{{ liked_me_users|length }}</span>
@@ -62,11 +63,7 @@
         <section class="matches-grid">
             <div class="match-card">
                 {% if profile[10] %}
-<<<<<<< HEAD
                     <img class="profile-image" src="{{ url_for('show_profile_image', user_id=profile[0]) }}" alt="Profilbild">
-=======
-                    <img src="{{ url_for('show_profile_image', user_id=profile[0]) }}" alt="Profilbild">
->>>>>>> 7fd7506993616e8a230d690d5f7fc429dff29ac2
                 {% else %}
                     <div class="profile-placeholder">
                         Ingen profilbild
@@ -78,6 +75,7 @@
                 <p><strong>E-post:</strong> {{ profile[1] }}</p>
                 <p><strong>Universitet/Högskola:</strong> {{ profile[3] or 'Ej angivet' }}</p>
                 <p><strong>Kurs/Program:</strong> {{ profile[4] or 'Ej angivet' }}</p>
+                <p><strong>Studietyp:</strong> {{ profile[5] or 'Ej angivet' }}</p>
                 <p><strong>Tillgänglighet:</strong> {{ profile[6] or 'Ej angivet' }}</p>
                 <p><strong>Kompetenser:</strong> {{ profile[7] or 'Ej angivet' }}</p>
                 <p><strong>Behöver hjälp med:</strong> {{ profile[8] or 'Ej angivet' }}</p>
@@ -103,13 +101,8 @@
     <script>
         function toggleLikesDropdown() {
             const dropdown = document.getElementById("likes-dropdown");
-
-            if (dropdown.style.display === "block") {
-                dropdown.style.display = "none";
-            } else {
-                dropdown.style.display = "block";
-            }
+            dropdown.classList.toggle("show");
         }
     </script>
 </body>
-</html> 
+</html>

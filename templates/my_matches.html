@@ -2,7 +2,8 @@
 <html lang="sv">
 <head>
     <meta charset="UTF-8">
-    <title>Mina matchningar</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Matchningar</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 </head>
 <body>
@@ -19,7 +20,7 @@
             </div>
 
             <div class="likes-wrapper">
-                <button type="button" class="likes-button" onclick="toggleLikesDropdown()">
+                <button type="button" class="likes-button" onclick="toggleLikesDropdown()" aria-label="Visa personer som visat intresse">
                     ♥
                     {% if liked_me_users %}
                         <span class="likes-count">{{ liked_me_users|length }}</span>
@@ -48,6 +49,52 @@
                 </div>
             </div>
         </nav>
+
+        <form method="GET" class="top-search-form">
+            <div class="top-search-row">
+                <input
+                    type="text"
+                    id="search"
+                    name="search"
+                    placeholder="Sök efter namn, kurs/program, universitet/högskola eller kompetenser..."
+                    value="{{ search_query }}"
+                >
+
+                <div class="filter-wrapper">
+                    <button type="button" class="filter-button" onclick="toggleFilterDropdown()">
+                        Filtrera
+                    </button>
+
+                    <div id="filter-dropdown" class="filter-dropdown">
+                        <label for="subject">Kurs/Program</label>
+                        <input
+                            type="text"
+                            id="subject"
+                            name="subject"
+                            placeholder="Exempel: Programmering"
+                            value="{{ subject_filter }}"
+                        >
+
+                        <label for="campus">Universitet/Högskola</label>
+                        <input
+                            type="text"
+                            id="campus"
+                            name="campus"
+                            placeholder="Exempel: Malmö"
+                            value="{{ campus_filter }}"
+                        >
+
+                        <button type="submit" class="apply-filter-button">
+                            Använd filter
+                        </button>
+                    </div>
+                </div>
+
+                <button type="submit" class="search-button">
+                    Sök
+                </button>
+            </div>
+        </form>
     </header>
 
     <main>
@@ -60,49 +107,66 @@
         {% endwith %}
 
         <section class="matches-grid">
-            {% if my_matches %}
-                {% for match in my_matches %}
+            {% if matches %}
+                {% for match in matches %}
                     <div class="match-card">
-                        {% if match[11] %}
-                            <img class="profile-image" src="{{ url_for('show_profile_image', user_id=match[1]) }}" alt="Profilbild">
+                        {% if match[9] %}
+                            <img class="profile-image" src="{{ url_for('show_profile_image', user_id=match[0]) }}" alt="Profilbild">
                         {% else %}
                             <div class="profile-placeholder">
                                 Ingen profilbild
                             </div>
                         {% endif %}
 
-                        <h3>{{ match[2] }}</h3>
+                        <h3>{{ match[1] }}</h3>
 
-                        <p><strong>E-post:</strong> {{ match[3] }}</p>
-                        <p><strong>Universitet/Högskola:</strong> {{ match[4] or 'Ej angivet' }}</p>
-                        <p><strong>Kurs/Program:</strong> {{ match[5] or 'Ej angivet' }}</p>
-                        <p><strong>Tillgänglighet:</strong> {{ match[7] or 'Ej angivet' }}</p>
-                        <p><strong>Kompetenser:</strong> {{ match[8] or 'Ej angivet' }}</p>
-                        <p><strong>Behöver hjälp med:</strong> {{ match[9] or 'Ej angivet' }}</p>
-                        <p><strong>Bio:</strong> {{ match[10] or 'Ej angivet' }}</p>
+                        <p><strong>Universitet/Högskola:</strong> {{ match[2] or 'Ej angivet' }}</p>
+                        <p><strong>Kurs/Program:</strong> {{ match[3] or 'Ej angivet' }}</p>
+                        <p><strong>Studietyp:</strong> {{ match[4] or 'Ej angivet' }}</p>
+                        <p><strong>Tillgänglighet:</strong> {{ match[5] or 'Ej angivet' }}</p>
+                        <p><strong>Kompetenser:</strong> {{ match[6] or 'Ej angivet' }}</p>
+                        <p><strong>Behöver hjälp med:</strong> {{ match[7] or 'Ej angivet' }}</p>
+                        <p><strong>Bio:</strong> {{ match[8] or 'Ej angivet' }}</p>
 
-                        <a class="button-link" href="{{ url_for('show_chat_page', match_id=match[0]) }}">
-                            Öppna chatt
-                        </a>
+                        <span class="match-score">Matchpoäng: {{ match[10] }}</span>
+
+                        <div class="swipe-buttons">
+                            <form method="POST" action="{{ url_for('handle_swipe', to_user_id=match[0], action='like') }}">
+                                <button type="submit" class="like-button">
+                                    Ja, intresserad
+                                </button>
+                            </form>
+
+                            <form method="POST" action="{{ url_for('handle_swipe', to_user_id=match[0], action='dislike') }}">
+                                <button type="submit" class="dislike-button">
+                                    Nej, inte intresserad
+                                </button>
+                            </form>
+                        </div>
                     </div>
                 {% endfor %}
             {% else %}
                 <div class="no-matches">
-                    Du har inga bekräftade matchningar ännu.
+                    Inga matchningar hittades.
                 </div>
             {% endif %}
         </section>
     </main>
 
     <script>
-        function toggleLikesDropdown() {
-            const dropdown = document.getElementById("likes-dropdown");
+        function toggleFilterDropdown() {
+            const dropdown = document.getElementById("filter-dropdown");
 
             if (dropdown.style.display === "block") {
                 dropdown.style.display = "none";
             } else {
                 dropdown.style.display = "block";
             }
+        }
+
+        function toggleLikesDropdown() {
+            const dropdown = document.getElementById("likes-dropdown");
+            dropdown.classList.toggle("show");
         }
     </script>
 </body>
