@@ -2,6 +2,7 @@
 <html lang="sv">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Chatt</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 </head>
@@ -19,7 +20,7 @@
             </div>
 
             <div class="likes-wrapper">
-                <button type="button" class="likes-button" onclick="toggleLikesDropdown()">
+                <button type="button" class="likes-button" onclick="toggleLikesDropdown()" aria-label="Visa personer som visat intresse">
                     ♥
                     {% if liked_me_users %}
                         <span class="likes-count">{{ liked_me_users|length }}</span>
@@ -31,7 +32,7 @@
                         {% for liked_user in liked_me_users %}
                             <a class="likes-item" href="{{ url_for('show_other_user_profile_page', user_id=liked_user[0]) }}">
                                 {% if liked_user[4] %}
-                                    <img src="{{ url_for('static', filename='uploads/' + liked_user[4]) }}" alt="Profilbild">
+                                    <img src="{{ url_for('show_profile_image', user_id=liked_user[0]) }}" alt="Profilbild">
                                 {% else %}
                                     <div class="small-profile-placeholder">?</div>
                                 {% endif %}
@@ -108,12 +109,7 @@
     <script>
         function toggleLikesDropdown() {
             const dropdown = document.getElementById("likes-dropdown");
-
-            if (dropdown.style.display === "block") {
-                dropdown.style.display = "none";
-            } else {
-                dropdown.style.display = "block";
-            }
+            dropdown.classList.toggle("show");
         }
 
         const chatTextarea = document.querySelector(".chat-form textarea");
