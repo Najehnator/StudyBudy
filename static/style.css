@@ -745,3 +745,50 @@ button:hover,
         width: 100%;
     }
 }
+
+/* ------------------------------
+   MY MATCHES - CHAT BUTTON
+------------------------------ */
+
+.match-actions {
+    margin-top: 20px;
+}
+
+.chat-button {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+
+    width: 100%;
+    padding: 14px 18px;
+
+    background: linear-gradient(135deg, #8b1e2d, #b52d42);
+    color: white;
+    text-decoration: none;
+
+    border-radius: 12px;
+
+    font-size: 15px;
+    font-weight: bold;
+
+    box-sizing: border-box;
+
+    box-shadow: 0 6px 16px rgba(139, 30, 45, 0.20);
+
+    transition: all 0.25s ease;
+}
+
+.chat-button:hover {
+    background: linear-gradient(135deg, #6f1622, #962437);
+    transform: translateY(-2px);
+    box-shadow: 0 10px 20px rgba(139, 30, 45, 0.30);
+}
+
+.chat-button:active {
+    transform: translateY(0);
+}
+
+.chat-icon {
+    font-size: 18px;
+}
