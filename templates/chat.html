@@ -39,7 +39,7 @@
 
                                 <div>
                                     <strong>{{ liked_user[1] }}</strong>
-                                    <span>{{ liked_user[2] or 'Ej campus' }} · {{ liked_user[3] or 'Ej ämne' }}</span>
+                                    <span>{{ liked_user[2] or 'Ej universitet/högskola' }} · {{ liked_user[3] or 'Ej kurs/program' }}</span>
                                 </div>
                             </a>
                         {% endfor %}
@@ -60,46 +60,58 @@
             {% endif %}
         {% endwith %}
 
-        <section class="chat-container">
+        <section class="chat-page">
             <div class="chat-header">
-                <h2>Chatt med {{ match_row[3] }}</h2>
+                <div>
+                    <h2>Chatt med {{ match_row[3] }}</h2>
+                    <p>Här kan ni skriva meddelanden till varandra.</p>
+                </div>
 
-                <a class="button-link" href="{{ url_for('show_my_matches_page') }}">
+                <a href="{{ url_for('show_my_matches_page') }}" class="back-button">
                     Tillbaka
                 </a>
             </div>
 
-            <div class="chat-messages">
+            <div id="chat-messages" class="chat-messages">
                 {% if chat_messages %}
                     {% for message in chat_messages %}
                         {% if message[1] == current_user_id %}
                             <div class="chat-message my-message">
-                                <p>{{ message[3] }}</p>
-                                <span>{{ message[4].strftime('%Y-%m-%d %H:%M') }}</span>
+                                <div class="message-bubble">
+                                    <p>{{ message[3] }}</p>
+                                    <span>
+                                        Du · {{ message[4].strftime('%Y-%m-%d %H:%M') }}
+                                    </span>
+                                </div>
                             </div>
                         {% else %}
                             <div class="chat-message other-message">
-                                <strong>{{ message[2] }}</strong>
-                                <p>{{ message[3] }}</p>
-                                <span>{{ message[4].strftime('%Y-%m-%d %H:%M') }}</span>
+                                <div class="message-bubble">
+                                    <p>{{ message[3] }}</p>
+                                    <span>
+                                        {{ message[2] }} · {{ message[4].strftime('%Y-%m-%d %H:%M') }}
+                                    </span>
+                                </div>
                             </div>
                         {% endif %}
                     {% endfor %}
                 {% else %}
-                    <p class="empty-chat">
-                        Inga meddelanden ännu. Skriv första meddelandet.
-                    </p>
+                    <div class="empty-chat">
+                        Inga meddelanden ännu. Skriv det första meddelandet.
+                    </div>
                 {% endif %}
             </div>
 
             <form method="POST" class="chat-form">
                 <textarea
                     name="message_text"
+                    id="message_text"
                     placeholder="Skriv ett meddelande..."
+                    rows="3"
                     required
                 ></textarea>
 
-                <button type="submit">
+                <button type="submit" class="send-button">
                     Skicka
                 </button>
             </form>
@@ -107,20 +119,45 @@
     </main>
 
     <script>
-        function toggleLikesDropdown() {
-            const dropdown = document.getElementById("likes-dropdown");
-            dropdown.classList.toggle("show");
-        }
+    function toggleLikesDropdown() {
+        const dropdown = document.getElementById("likes-dropdown");
+        dropdown.classList.toggle("show");
+    }
 
-        const chatTextarea = document.querySelector(".chat-form textarea");
-        const chatForm = document.querySelector(".chat-form");
+    const chatMessages = document.getElementById("chat-messages");
+    const messageInput = document.querySelector("textarea[name='message_text']");
+    const chatForm = document.querySelector(".chat-form");
+    let userIsTyping = false;
 
-        chatTextarea.addEventListener("keydown", function(event) {
+    if (chatMessages) {
+        chatMessages.scrollTop = chatMessages.scrollHeight;
+    }
+
+    if (messageInput) {
+        messageInput.addEventListener("focus", function() {
+            userIsTyping = true;
+        });
+
+        messageInput.addEventListener("blur", function() {
+            userIsTyping = false;
+        });
+
+        messageInput.addEventListener("keydown", function(event) {
             if (event.key === "Enter" && !event.shiftKey) {
                 event.preventDefault();
-                chatForm.submit();
+
+                if (messageInput.value.trim() !== "") {
+                    chatForm.submit();
+                }
             }
         });
+    }
+
+    setInterval(function() {
+        if (!userIsTyping) {
+            window.location.reload();
+        }
+    }, 5000);
     </script>
 </body>
 </html>
