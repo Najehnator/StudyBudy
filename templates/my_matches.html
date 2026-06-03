@@ -106,6 +106,18 @@
             {% endif %}
         {% endwith %}
 
+        <section class="matches-intro">
+            <h2>Hitta studiekamrater</h2>
+            <p>
+                Här kan du visa intresse för andra studenter. När båda visar intresse för varandra
+                skapas en matchning och chatten blir tillgänglig under Mina matchningar.
+            </p>
+
+            <a href="{{ url_for('show_my_matches_page') }}" class="chat-button">
+                Gå till Mina matchningar
+            </a>
+        </section>
+
         <section class="matches-grid">
             {% if matches %}
                 {% for match in matches %}
@@ -122,6 +134,7 @@
 
                         <p><strong>Universitet/Högskola:</strong> {{ match[2] or 'Ej angivet' }}</p>
                         <p><strong>Kurs/Program:</strong> {{ match[3] or 'Ej angivet' }}</p>
+                        <p><strong>Studietyp:</strong> {{ match[4] or 'Ej angivet' }}</p>
                         <p><strong>Tillgänglighet:</strong> {{ match[5] or 'Ej angivet' }}</p>
                         <p><strong>Kompetenser:</strong> {{ match[6] or 'Ej angivet' }}</p>
                         <p><strong>Behöver hjälp med:</strong> {{ match[7] or 'Ej angivet' }}</p>
@@ -167,6 +180,15 @@
             const dropdown = document.getElementById("likes-dropdown");
             dropdown.classList.toggle("show");
         }
+
+        document.addEventListener("click", function(event) {
+            const likesWrapper = document.querySelector(".likes-wrapper");
+            const likesDropdown = document.getElementById("likes-dropdown");
+
+            if (likesWrapper && likesDropdown && !likesWrapper.contains(event.target)) {
+                likesDropdown.classList.remove("show");
+            }
+        });
     </script>
 </body>
 </html>

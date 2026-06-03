@@ -17,7 +17,7 @@
 
     <main>
         <section class="card">
-            <h2>Registrera konto</h2>
+            <h2>Logga in</h2>
 
             {% with messages = get_flashed_messages(with_categories=true) %}
                 {% if messages %}
@@ -34,7 +34,7 @@
                 <label for="password">Lösenord</label>
                 <input type="password" id="password" name="password" required>
 
-                <button type="submit">Registrera</button>
+                <button type="submit">Logga in</button>
             </form>
         </section>
     </main>
